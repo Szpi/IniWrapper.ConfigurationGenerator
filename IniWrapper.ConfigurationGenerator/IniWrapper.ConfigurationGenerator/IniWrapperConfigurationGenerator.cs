@@ -33,15 +33,74 @@ namespace IniWrapper.ConfigurationGenerator
 
             foreach (var sectionName in sectionNames)
             {
-                GenerateSectionClass(sectionName);
+                var membersFromIni = _iniParserWrapper.ReadAllFromSection(sectionName);
+                GeneratePropertyClass(sectionName, membersFromIni.Values);
             }
 
-            //GenerateIniConfigurationClass(sectionNames);
+            GenerateIniConfigurationClass(sectionNames);
         }
 
-        private void GenerateIniConfigurationClass(string sectionNames)
+        private void GenerateIniConfigurationClass(string[] sectionNames)
         {
-            throw new NotImplementedException();
+            GenerateMainConfigurationClass("MainConfiguration", sectionNames);
+        }
+
+        private void GenerateMainConfigurationClass(string mainconfiguration, string[] sectionNames)
+        {
+            var members = new SyntaxList<MemberDeclarationSyntax>();
+
+            foreach (var iniLine in sectionNames)
+            {
+                var propertyDeclaration = GetClassPropertyDeclarationSyntax(iniLine);
+
+                members = members.Add(propertyDeclaration);
+            }
+
+            var classSyntax = GetClassSyntax(mainconfiguration, members);
+
+            var generatedClass = FormatSyntax(classSyntax);
+
+            _fileSystem.File.WriteAllText(GenerateClassFilePath(mainconfiguration), generatedClass);
+        }
+
+        private PropertyDeclarationSyntax GetClassPropertyDeclarationSyntax(string iniLine)
+        {
+            var propertyDeclaration =
+                 PropertyDeclaration(
+                         IdentifierName(iniLine),
+                         Identifier(
+                             TriviaList(),
+                             iniLine,
+                             TriviaList(
+                                 Space)))
+                     .WithModifiers(
+                         TokenList(
+                             Token(
+                                 TriviaList(),
+                                 SyntaxKind.PublicKeyword,
+                                 TriviaList(
+                                     Space))))
+                     .WithAccessorList(
+                         AccessorList(
+                                 List<AccessorDeclarationSyntax>(
+                                     new AccessorDeclarationSyntax[]
+                                     {
+                                        AccessorDeclaration(
+                                                SyntaxKind.GetAccessorDeclaration)
+                                            .WithSemicolonToken(
+                                                Token(SyntaxKind.SemicolonToken)),
+                                        AccessorDeclaration(
+                                                SyntaxKind.SetAccessorDeclaration)
+                                            .WithSemicolonToken(
+                                                Token(SyntaxKind.SemicolonToken))
+                                     }))
+                             .WithCloseBraceToken(
+                                 Token(
+                                     TriviaList(),
+                                     SyntaxKind.CloseBraceToken,
+                                     TriviaList(
+                                         new[] { Space, LineFeed }))));
+            return propertyDeclaration;
         }
 
         private void CreateOutputDictionary()
@@ -52,12 +111,11 @@ namespace IniWrapper.ConfigurationGenerator
             }
         }
 
-        private void GenerateSectionClass(string sectionName)
+        private void GeneratePropertyClass(string sectionName, IEnumerable<string> propertiesNames)
         {
             var members = new SyntaxList<MemberDeclarationSyntax>();
-            var membersFromIni = _iniParserWrapper.ReadAllFromSection(sectionName);
 
-            foreach (var iniLine in membersFromIni)
+            foreach (var iniLine in propertiesNames)
             {
                 var propertyDeclaration = GetPropertyDeclarationSyntax(iniLine);
                 members = members.Add(propertyDeclaration);
@@ -65,11 +123,17 @@ namespace IniWrapper.ConfigurationGenerator
 
             var classSyntax = GetClassSyntax(sectionName, members);
             
+            var generatedClass = FormatSyntax(classSyntax);
+
+            _fileSystem.File.WriteAllText(GenerateClassFilePath(sectionName), generatedClass);
+        }
+
+        private static string FormatSyntax(CompilationUnitSyntax classSyntax)
+        {
             var workspace = new AdhocWorkspace();
             var formattedSyntax = Formatter.Format(classSyntax, workspace);
             var generatedClass = formattedSyntax.ToFullString();
-
-            _fileSystem.File.WriteAllText(GenerateClassFilePath(sectionName), generatedClass);
+            return generatedClass;
         }
 
         private static CompilationUnitSyntax GetClassSyntax(string sectionName, SyntaxList<MemberDeclarationSyntax> members)
@@ -90,7 +154,7 @@ namespace IniWrapper.ConfigurationGenerator
                                                             .WithMembers(members)));
         }
 
-        private static PropertyDeclarationSyntax GetPropertyDeclarationSyntax(KeyValuePair<string, string> iniLine)
+        private static PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName)
         {
             var propertyDeclaration =
                 PropertyDeclaration(
@@ -102,7 +166,7 @@ namespace IniWrapper.ConfigurationGenerator
                                     Space))),
                         Identifier(
                             TriviaList(),
-                            iniLine.Key,
+                            propertyName,
                             TriviaList(
                                 Space)))
                     .WithModifiers(
