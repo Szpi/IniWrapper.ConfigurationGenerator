@@ -16,13 +16,15 @@ namespace IniWrapper.ConfigurationGenerator
         private readonly IFileSystem _fileSystem;
         private readonly IIniParserWrapper _iniParserWrapper;
         private readonly string _outputDictionary;
+        private readonly string _namespace;
 
         public IniWrapperConfigurationGenerator(IIniParserWrapper iniParserWrapper, string outputDictionary,
-                                                IFileSystem fileSystem)
+                                                IFileSystem fileSystem, string @namespace)
         {
             _iniParserWrapper = iniParserWrapper;
             _outputDictionary = outputDictionary;
             _fileSystem = fileSystem;
+            _namespace = @namespace;
         }
 
         public void Generate()
@@ -34,7 +36,7 @@ namespace IniWrapper.ConfigurationGenerator
             foreach (var sectionName in sectionNames)
             {
                 var membersFromIni = _iniParserWrapper.ReadAllFromSection(sectionName);
-                GeneratePropertyClass(sectionName, membersFromIni.Values);
+                GeneratePropertyClass(sectionName, membersFromIni.Keys);
             }
 
             GenerateIniConfigurationClass(sectionNames);
@@ -136,11 +138,13 @@ namespace IniWrapper.ConfigurationGenerator
             return generatedClass;
         }
 
-        private static CompilationUnitSyntax GetClassSyntax(string sectionName, SyntaxList<MemberDeclarationSyntax> members)
+        private CompilationUnitSyntax GetClassSyntax(string sectionName, SyntaxList<MemberDeclarationSyntax> members)
         {
             return CompilationUnit()
                 .WithMembers(
-                    SingletonList<MemberDeclarationSyntax>( ClassDeclaration( Identifier(TriviaList(), sectionName, TriviaList(new[]{Space,LineFeed})))
+                    SingletonList<MemberDeclarationSyntax>(NamespaceDeclaration(
+                                                                   IdentifierName(_namespace))
+                                                               .WithMembers(SingletonList<MemberDeclarationSyntax>(ClassDeclaration( Identifier(TriviaList(), sectionName, TriviaList(new[]{Space,LineFeed})))
                                                             .WithKeyword(Token(TriviaList(),
                                                                                SyntaxKind.ClassKeyword,
                                                                                TriviaList(
@@ -151,7 +155,7 @@ namespace IniWrapper.ConfigurationGenerator
                                                                     SyntaxKind.OpenBraceToken,
                                                                     TriviaList(
                                                                         new[] { Space, LineFeed })))
-                                                            .WithMembers(members)));
+                                                            .WithMembers(members)))));
         }
 
         private static PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName)
