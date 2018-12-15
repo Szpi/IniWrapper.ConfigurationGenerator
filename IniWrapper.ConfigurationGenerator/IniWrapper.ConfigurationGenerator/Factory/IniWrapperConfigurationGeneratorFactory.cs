@@ -1,8 +1,9 @@
-﻿using System.IO.Abstractions;
-using IniWrapper.ConfigurationGenerator.Configuration;
+﻿using IniWrapper.ConfigurationGenerator.Configuration;
 using IniWrapper.ConfigurationGenerator.IniParser;
 using IniWrapper.ConfigurationGenerator.PropertySyntax;
 using IniWrapper.ConfigurationGenerator.PropertySyntax.Kind;
+using IniWrapper.ConfigurationGenerator.Section;
+using System.IO.Abstractions;
 
 namespace IniWrapper.ConfigurationGenerator.Factory
 {
@@ -12,13 +13,15 @@ namespace IniWrapper.ConfigurationGenerator.Factory
         {
             var iniWrapper = new IniParserWrapper(configuration.FilePath, configuration.BufferSize, new ReadSectionsParser());
             var syntaxManager = new SyntaxKindManager(configuration.ListSeparator);
+
             return new IniWrapperConfigurationGenerator(iniWrapper,
-                                                        configuration.OutputFolder,
+                                                        configuration,
                                                         new FileSystem(),
-                                                        configuration.NameSpace,
                                                         new ListPropertyDeclarationSyntaxGenerator(syntaxManager, configuration.ListSeparator),
                                                         new PropertyDeclarationSyntaxGenerator(),
-                                                        syntaxManager);
+                                                        syntaxManager,
+                                                        new SectionsAnalyzer(configuration.ComplexDataSeparator),
+                                                        new ListComplexDataDeclarationSyntaxGenerator());
         }
     }
 }

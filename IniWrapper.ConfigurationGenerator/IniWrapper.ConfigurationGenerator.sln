@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IniWrapper.ConfigurationGenerator", "IniWrapper.ConfigurationGenerator\IniWrapper.ConfigurationGenerator.csproj", "{757A0AA9-963B-4660-A596-C0FE0A72F5AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationGenerator", "ConfigurationGenerator\ConfigurationGenerator.csproj", "{92313FA3-6D5B-4C6A-8836-443C1A8836DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigurationGenerator", "ConfigurationGenerator\ConfigurationGenerator.csproj", "{92313FA3-6D5B-4C6A-8836-443C1A8836DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IniWrapper.ConfigurationGenerator.Tests", "IniWrapper.ConfigurationGenerator.Tests\IniWrapper.ConfigurationGenerator.Tests.csproj", "{73642368-088F-4714-ADE9-9B1A0DCC646E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{92313FA3-6D5B-4C6A-8836-443C1A8836DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92313FA3-6D5B-4C6A-8836-443C1A8836DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92313FA3-6D5B-4C6A-8836-443C1A8836DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73642368-088F-4714-ADE9-9B1A0DCC646E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73642368-088F-4714-ADE9-9B1A0DCC646E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73642368-088F-4714-ADE9-9B1A0DCC646E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73642368-088F-4714-ADE9-9B1A0DCC646E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

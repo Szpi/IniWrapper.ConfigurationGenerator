@@ -8,6 +8,7 @@
         public string MainConfiguration { get; }
         public int BufferSize { get; }
         public char ListSeparator { get; }
+        public char ComplexDataSeparator { get; } = '_';
 
         public GeneratorConfiguration(string filePath,
                                       string outputFolder,

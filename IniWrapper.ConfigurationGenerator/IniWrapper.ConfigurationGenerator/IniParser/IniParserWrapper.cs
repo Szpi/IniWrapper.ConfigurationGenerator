@@ -27,16 +27,16 @@ namespace IniWrapper.ConfigurationGenerator.IniParser
 
         public string[] GetSectionsFromFile()
         {
-            GetPrivateProfileSectionNames(_buffer, _buffer.Length, _iniFilePath);
-            var allSections = Encoding.ASCII.GetString(_buffer);
+            var readCharacters = GetPrivateProfileSectionNames(_buffer, _buffer.Length, _iniFilePath);
+            var allSections = Encoding.ASCII.GetString(_buffer, 0 , readCharacters);
             var sectionNames = allSections.Trim(IniApiSeparator).Split(new[] { IniApiSeparator }, StringSplitOptions.RemoveEmptyEntries);
             return sectionNames;
         }
 
         public IDictionary<string, string> ReadAllFromSection(string section)
         {
-            GetPrivateProfileSection(section, _buffer, _buffer.Length, _iniFilePath);
-            var readFromFile =  Encoding.ASCII.GetString(_buffer).Trim(IniApiSeparator);
+            var readCharacters = GetPrivateProfileSection(section, _buffer, _buffer.Length, _iniFilePath);
+            var readFromFile = Encoding.ASCII.GetString(_buffer, 0, readCharacters).Trim(IniApiSeparator);
             return _readSectionsParser.Parse(readFromFile);
         }
     }
