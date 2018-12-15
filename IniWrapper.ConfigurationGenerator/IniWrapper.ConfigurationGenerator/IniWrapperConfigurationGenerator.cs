@@ -36,7 +36,7 @@ namespace IniWrapper.ConfigurationGenerator
             foreach (var sectionName in sectionNames)
             {
                 var membersFromIni = _iniParserWrapper.ReadAllFromSection(sectionName);
-                GeneratePropertyClass(sectionName, membersFromIni.Keys);
+                GeneratePropertyClass(sectionName, membersFromIni);
             }
 
             GenerateIniConfigurationClass(sectionNames);
@@ -47,7 +47,7 @@ namespace IniWrapper.ConfigurationGenerator
             GenerateMainConfigurationClass("MainConfiguration", sectionNames);
         }
 
-        private void GenerateMainConfigurationClass(string mainconfiguration, string[] sectionNames)
+        private void GenerateMainConfigurationClass(string mainConfiguration, string[] sectionNames)
         {
             var members = new SyntaxList<MemberDeclarationSyntax>();
 
@@ -58,11 +58,11 @@ namespace IniWrapper.ConfigurationGenerator
                 members = members.Add(propertyDeclaration);
             }
 
-            var classSyntax = GetClassSyntax(mainconfiguration, members);
+            var classSyntax = GetClassSyntax(mainConfiguration, members);
 
             var generatedClass = FormatSyntax(classSyntax);
 
-            _fileSystem.File.WriteAllText(GenerateClassFilePath(mainconfiguration), generatedClass);
+            _fileSystem.File.WriteAllText(GenerateClassFilePath(mainConfiguration), generatedClass);
         }
 
         private PropertyDeclarationSyntax GetClassPropertyDeclarationSyntax(string iniLine)
@@ -113,13 +113,13 @@ namespace IniWrapper.ConfigurationGenerator
             }
         }
 
-        private void GeneratePropertyClass(string sectionName, IEnumerable<string> propertiesNames)
+        private void GeneratePropertyClass(string sectionName, IDictionary<string, string> propertiesNames)
         {
             var members = new SyntaxList<MemberDeclarationSyntax>();
 
             foreach (var iniLine in propertiesNames)
             {
-                var propertyDeclaration = GetPropertyDeclarationSyntax(iniLine);
+                var propertyDeclaration = GetPropertyDeclarationSyntax(iniLine.Key, iniLine.Value);
                 members = members.Add(propertyDeclaration);
             }
 
@@ -158,14 +158,15 @@ namespace IniWrapper.ConfigurationGenerator
                                                             .WithMembers(members)))));
         }
 
-        private static PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName)
+        private static PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName, string iniValue)
         {
+            var valueType = GetSyntaxKind(iniValue);
             var propertyDeclaration =
                 PropertyDeclaration(
                         PredefinedType(
                             Token(
                                 TriviaList(),
-                                SyntaxKind.StringKeyword,
+                                valueType,
                                 TriviaList(
                                     Space))),
                         Identifier(
@@ -206,6 +207,36 @@ namespace IniWrapper.ConfigurationGenerator
         private string GenerateClassFilePath(string sectionName)
         {
             return _fileSystem.Path.Combine(_outputDictionary, $"{sectionName}.cs");
+        }
+
+        private static SyntaxKind GetSyntaxKind(string value)
+        {
+            if (Boolean.TryParse(value, out var boolResult))
+            {
+                return SyntaxKind.BoolKeyword;
+            }
+
+            if (int.TryParse(value, out var intResult))
+            {
+                return SyntaxKind.IntKeyword;
+            }
+
+            if (float.TryParse(value, out var floatResult))
+            {
+                return SyntaxKind.FloatKeyword;
+            }
+
+            if (double.TryParse(value, out var doubleResult))
+            {
+                return SyntaxKind.DoubleKeyword;
+            }
+
+            if (byte.TryParse(value, out var byteResult))
+            {
+                return SyntaxKind.ByteKeyword;
+            }
+
+            return SyntaxKind.StringKeyword;
         }
     }
 }
