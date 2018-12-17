@@ -1,16 +1,17 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+﻿using IniWrapper.ConfigurationGenerator.Configuration;
+using IniWrapper.ConfigurationGenerator.Factory;
+using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
-using IniWrapper.ConfigurationGenerator.Configuration;
-using IniWrapper.ConfigurationGenerator.Factory;
 
 namespace ConfigurationGenerator
 {
     internal class Program
     {
 
-        [Option("-f|--file <file_path>", "Path to ini configuration file, which should be used as model to classes generation", CommandOptionType.SingleValue)]
+        [Option("-f|--file <file_path>", "Path to ini configuration file or dictionary, which should be used as model to classes generation", CommandOptionType.SingleValue)]
         [Required]
         public string FilePath { get; }
 
@@ -18,22 +19,48 @@ namespace ConfigurationGenerator
         [Required]
         public string OutputFolder { get; }
 
-        [Option("-n|--namespace <namespace>", "Namespace that will be used for all generated classes (default value Configuration)", CommandOptionType.SingleValue)]
+        [Option("-n|--namespace <namespace>", "Namespace that will be used for all generated classes (default value 'Configuration')", CommandOptionType.SingleValue)]
         public string NameSpace { get; } = "Configuration";
 
-        [Option("-m|--mainclass <class_name>", "Main configuration class name that will contain all section classes (default MainConfiguration)", CommandOptionType.SingleValue)]
+        [Option("-m|--mainclass <class_name>", "Main configuration class name that will contain all section classes (default value 'MainConfiguration')", CommandOptionType.SingleValue)]
         public string MainConfiguration { get; } = "MainConfiguration";
 
-        [Option("-b|--buffer <int>", "Reading buffer size (pass only when files are really big)", CommandOptionType.SingleValue)]
+        [Option("-b|--buffer <int>", "Reading buffer size (pass only when files are really big default value 100_000)", CommandOptionType.SingleValue)]
         public int BufferSize { get; } = 100_000;
 
-        [Option("-s|--separator <char>", "Many value separator in case of Key=Value test=a|b|c write '|' default ',' ",
+        [Option("-s|--separator <char>", "Many value separator in case of test=a|b|c ( Key=Value) pass '|' (default separator ',')",
             CommandOptionType.SingleValue)]
         public string ListSeparator { get; } = ",";
 
+        [Option("-a|--attribute <bool>", "Values (true/false or 1/0) Determines if generate IniOptions attribute (default false)",
+            CommandOptionType.SingleValue)]
+        public bool GenerateIniOptionAttribute { get; } = false;
+
         private void OnExecute()
         {
-            var configuration = new GeneratorConfiguration(FilePath, OutputFolder, NameSpace, MainConfiguration, BufferSize, ListSeparator.ToCharArray().FirstOrDefault());
+            if (!Directory.Exists(FilePath))
+            {
+                GenerateClassesForIniFile(FilePath);
+                return;
+            }
+
+            var iniFilesInDirectory = Directory.GetFiles(FilePath, "*.ini", SearchOption.TopDirectoryOnly);
+
+            foreach (var iniFile in iniFilesInDirectory)
+            {
+                GenerateClassesForIniFile(iniFile);
+            }
+        }
+
+        private void GenerateClassesForIniFile(string pathToIniFile)
+        {
+            var configuration = new GeneratorConfiguration(pathToIniFile,
+                                                           OutputFolder,
+                                                           NameSpace,
+                                                           MainConfiguration,
+                                                           BufferSize,
+                                                           ListSeparator.ToCharArray().FirstOrDefault(),
+                                                           GenerateIniOptionAttribute);
 
             var generator = new IniWrapperConfigurationGeneratorFactory().Create(configuration);
 

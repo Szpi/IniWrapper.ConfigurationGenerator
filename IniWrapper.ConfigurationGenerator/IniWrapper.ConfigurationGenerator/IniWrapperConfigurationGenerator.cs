@@ -1,17 +1,15 @@
-﻿using IniWrapper.ConfigurationGenerator.IniParser;
-using IniWrapper.ConfigurationGenerator.PropertySyntax;
+﻿using IniWrapper.ConfigurationGenerator.Configuration;
+using IniWrapper.ConfigurationGenerator.IniParser;
+using IniWrapper.ConfigurationGenerator.Section;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
-using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
-using IniWrapper.ConfigurationGenerator.Configuration;
-using IniWrapper.ConfigurationGenerator.PropertySyntax.Kind;
-using IniWrapper.ConfigurationGenerator.Section;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using IniWrapper.ConfigurationGenerator.Syntax;
+using IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax.Kind;
 
 namespace IniWrapper.ConfigurationGenerator
 {
@@ -21,29 +19,23 @@ namespace IniWrapper.ConfigurationGenerator
         private readonly IIniParserWrapper _iniParserWrapper;
         private readonly GeneratorConfiguration _generatorConfiguration;
 
-        private readonly PropertyDeclarationSyntaxGenerator _propertyDeclarationSyntaxGenerator;
-        private readonly ListPropertyDeclarationSyntaxGenerator _listPropertyDeclarationSyntaxGenerator;
-        private readonly ListComplexDataDeclarationSyntaxGenerator _listComplexDataDeclarationSyntaxGenerator;
         private readonly ISyntaxKindManager _syntaxKindManager;
         private readonly ISectionsAnalyzer _sectionsAnalyzer;
+        private readonly ISyntaxGeneratorFacade _syntaxGeneratorFacade;
 
         public IniWrapperConfigurationGenerator(IIniParserWrapper iniParserWrapper,
                                                 GeneratorConfiguration generatorConfiguration,
                                                 IFileSystem fileSystem,
-                                                ListPropertyDeclarationSyntaxGenerator listPropertyDeclarationSyntaxGenerator,
-                                                PropertyDeclarationSyntaxGenerator propertyDeclarationSyntaxGenerator, 
-                                                ISyntaxKindManager syntaxKindManager, 
+                                                ISyntaxKindManager syntaxKindManager,
                                                 ISectionsAnalyzer sectionsAnalyzer, 
-                                                ListComplexDataDeclarationSyntaxGenerator listComplexDataDeclarationSyntaxGenerator)
+                                                ISyntaxGeneratorFacade syntaxGeneratorFacade)
         {
             _iniParserWrapper = iniParserWrapper;
             _fileSystem = fileSystem;
             _generatorConfiguration = generatorConfiguration;
-            _listPropertyDeclarationSyntaxGenerator = listPropertyDeclarationSyntaxGenerator;
-            _propertyDeclarationSyntaxGenerator = propertyDeclarationSyntaxGenerator;
             _syntaxKindManager = syntaxKindManager;
             _sectionsAnalyzer = sectionsAnalyzer;
-            _listComplexDataDeclarationSyntaxGenerator = listComplexDataDeclarationSyntaxGenerator;
+            _syntaxGeneratorFacade = syntaxGeneratorFacade;
         }
 
         public void Generate()
@@ -57,7 +49,7 @@ namespace IniWrapper.ConfigurationGenerator
             foreach (var sectionName in separateSections)
             {
                 var membersFromIni = _iniParserWrapper.ReadAllFromSection(sectionName);
-                GeneratePropertyClass(sectionName, membersFromIni);
+                GenerateSectionClass(sectionName, membersFromIni);
             }
 
             foreach (var complexDataSection in complexDataSections)
@@ -65,7 +57,7 @@ namespace IniWrapper.ConfigurationGenerator
                 var originalPrefixOfSection = $"{complexDataSection}{_generatorConfiguration.ComplexDataSeparator}";
                 var originalSectionFromFile = sectionNames.FirstOrDefault(x => x.StartsWith(originalPrefixOfSection));
                 var membersFromIni = _iniParserWrapper.ReadAllFromSection(originalSectionFromFile);
-                GeneratePropertyClass(complexDataSection, membersFromIni);
+                GenerateSectionClass(complexDataSection, membersFromIni);
             }
 
             GenerateMainConfigurationClass(_generatorConfiguration.MainConfiguration, separateSections, complexDataSections);
@@ -78,64 +70,24 @@ namespace IniWrapper.ConfigurationGenerator
 
             foreach (var iniLine in sectionNames)
             {
-                var propertyDeclaration = GetClassPropertyDeclarationSyntax(iniLine);
-
+                var propertyDeclaration = _syntaxGeneratorFacade.GetClassPropertyDeclarationSyntax(iniLine);
                 members = members.Add(propertyDeclaration);
             }
 
             foreach (var complexDataSection in complexDataSections)
             {
-                var listOfComplexData = _listComplexDataDeclarationSyntaxGenerator.GetPropertyDeclarationSyntax(complexDataSection);
+                var listOfComplexData = _syntaxGeneratorFacade.GetComplexListPropertyDeclarationSyntax(complexDataSection);
+
                 members = members.Add(listOfComplexData);
             }
 
-            var classSyntax = GetClassSyntax(mainConfiguration, members, complexDataSections.Any());
+            var classSyntax = GetClassSyntax(mainConfiguration, members, complexDataSections.Any(), false);
 
             var generatedClass = FormatSyntax(classSyntax);
 
             _fileSystem.File.WriteAllText(GenerateClassFilePath(mainConfiguration), generatedClass);
         }
-
-        private PropertyDeclarationSyntax GetClassPropertyDeclarationSyntax(string iniLine)
-        {
-            var propertyDeclaration =
-                 PropertyDeclaration(
-                         IdentifierName(iniLine),
-                         Identifier(
-                             TriviaList(),
-                             iniLine,
-                             TriviaList(
-                                 Space)))
-                     .WithModifiers(
-                         TokenList(
-                             Token(
-                                 TriviaList(),
-                                 SyntaxKind.PublicKeyword,
-                                 TriviaList(
-                                     Space))))
-                     .WithAccessorList(
-                         AccessorList(
-                                 List<AccessorDeclarationSyntax>(
-                                     new AccessorDeclarationSyntax[]
-                                     {
-                                        AccessorDeclaration(
-                                                SyntaxKind.GetAccessorDeclaration)
-                                            .WithSemicolonToken(
-                                                Token(SyntaxKind.SemicolonToken)),
-                                        AccessorDeclaration(
-                                                SyntaxKind.SetAccessorDeclaration)
-                                            .WithSemicolonToken(
-                                                Token(SyntaxKind.SemicolonToken))
-                                     }))
-                             .WithCloseBraceToken(
-                                 Token(
-                                     TriviaList(),
-                                     SyntaxKind.CloseBraceToken,
-                                     TriviaList(
-                                         new[] { Space, LineFeed }))));
-            return propertyDeclaration;
-        }
-
+        
         private void CreateOutputDictionary()
         {
             if (!_fileSystem.Directory.Exists(_generatorConfiguration.OutputFolder))
@@ -144,7 +96,7 @@ namespace IniWrapper.ConfigurationGenerator
             }
         }
 
-        private void GeneratePropertyClass(string sectionName, IDictionary<string, string> propertiesNames)
+        private void GenerateSectionClass(string sectionName, IDictionary<string, string> propertiesNames)
         {
             var members = new SyntaxList<MemberDeclarationSyntax>();
 
@@ -153,10 +105,11 @@ namespace IniWrapper.ConfigurationGenerator
             {
                 var (propertyDeclaration, shouldGenerateGenericUsing) = GetPropertyDeclarationSyntax(iniLine.Key, iniLine.Value);
                 generateGenericUsing |= shouldGenerateGenericUsing;
+                propertyDeclaration = _syntaxGeneratorFacade.AddIniOptionsAttributeToProperty(sectionName, iniLine.Key, propertyDeclaration);
                 members = members.Add(propertyDeclaration);
             }
 
-            var classSyntax = GetClassSyntax(sectionName, members, generateGenericUsing);
+            var classSyntax = GetClassSyntax(sectionName, members, generateGenericUsing, _generatorConfiguration.GenerateIniOptionAttribute);
 
             var generatedClass = FormatSyntax(classSyntax);
 
@@ -171,69 +124,46 @@ namespace IniWrapper.ConfigurationGenerator
             return generatedClass;
         }
 
-        private CompilationUnitSyntax GetClassSyntax(string sectionName, SyntaxList<MemberDeclarationSyntax> members,
-                                                     bool generateGenericUsing)
+        private CompilationUnitSyntax GetClassSyntax(string sectionName, SyntaxList<MemberDeclarationSyntax> members, bool generateGenericUsing, bool generateIniAttributeUsing)
         {
-            var compilationUnit = CompilationUnit();
-            if (generateGenericUsing)
-            {
-                compilationUnit = compilationUnit.WithUsings(
-                    SingletonList<UsingDirectiveSyntax>(
-                        UsingDirective(
-                                QualifiedName(
-                                    QualifiedName(
-                                        IdentifierName("System"),
-                                        IdentifierName("Collections")),
-                                    IdentifierName("Generic")))
-                            .WithUsingKeyword(
-                                Token(
-                                    TriviaList(),
-                                    SyntaxKind.UsingKeyword,
-                                    TriviaList(
-                                        Space)))
-                            .WithSemicolonToken(
-                                Token(
-                                    TriviaList(),
-                                    SyntaxKind.SemicolonToken,
-                                    TriviaList(
-                                        LineFeed)))));
-            }
+            var usingSyntax = GetNecessaryUsingSyntax(generateGenericUsing, generateIniAttributeUsing);
 
-            return compilationUnit
-                .WithMembers(
-                    SingletonList<MemberDeclarationSyntax>(NamespaceDeclaration(
-                                                                   IdentifierName(_generatorConfiguration.NameSpace))
-                                                               .WithMembers(SingletonList<MemberDeclarationSyntax>(ClassDeclaration(Identifier(TriviaList(), sectionName, TriviaList(new[] { Space, LineFeed })))
-                                                            .WithKeyword(Token(TriviaList(),
-                                                                               SyntaxKind.ClassKeyword,
-                                                                               TriviaList(
-                                                                                   Space)))
-                                                            .WithOpenBraceToken(
-                                                                Token(
-                                                                    TriviaList(),
-                                                                    SyntaxKind.OpenBraceToken,
-                                                                    TriviaList(
-                                                                        new[] { Space, LineFeed })))
-                                                            .WithMembers(members)))));
+            return _syntaxGeneratorFacade.GetClassSyntax(sectionName, members, usingSyntax, _generatorConfiguration.NameSpace);
         }
 
-        private ( PropertyDeclarationSyntax GeneratedProperty, bool ShouldGenerateUsingGeneric) GetPropertyDeclarationSyntax(string propertyName, string iniValue)
+        private SyntaxList<UsingDirectiveSyntax> GetNecessaryUsingSyntax(bool generateGenericUsing, bool generateIniAttributeUsing)
+        {
+            var usingSyntax = new SyntaxList<UsingDirectiveSyntax>();
+            if (generateGenericUsing)
+            {
+                var collectionGenericUsingSyntax = _syntaxGeneratorFacade.GetCollectionsGenericUsingSyntax();
+                usingSyntax = usingSyntax.Add(collectionGenericUsingSyntax);
+            }
+
+            if (generateIniAttributeUsing)
+            {
+                var iniWrapperAttributeUsingSyntax = _syntaxGeneratorFacade.GetIniWrapperAttributeUsingSyntax();
+                usingSyntax = usingSyntax.Add(iniWrapperAttributeUsingSyntax);
+            }
+
+            return usingSyntax;
+        }
+
+        private (PropertyDeclarationSyntax GeneratedProperty, bool ShouldGenerateUsingGeneric) GetPropertyDeclarationSyntax(string propertyName, string iniValue)
         {
             var valueType = _syntaxKindManager.GetSyntaxKind(iniValue);
 
             if (valueType == SyntaxKind.List)
             {
-                return (_listPropertyDeclarationSyntaxGenerator.GetPropertyDeclarationSyntax(propertyName, iniValue, valueType), true);
+                return (_syntaxGeneratorFacade.GetListPropertyDeclarationSyntax(propertyName, iniValue), true);
             }
 
-            return (_propertyDeclarationSyntaxGenerator.GetPropertyDeclarationSyntax(propertyName, iniValue, valueType), false);
+            return (_syntaxGeneratorFacade.GetPropertyDeclarationSyntax(propertyName, iniValue, valueType), false);
         }
 
         private string GenerateClassFilePath(string sectionName)
         {
             return _fileSystem.Path.Combine(_generatorConfiguration.OutputFolder, $"{sectionName}.cs");
         }
-
-        
     }
 }

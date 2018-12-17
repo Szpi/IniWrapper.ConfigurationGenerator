@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 
-namespace IniWrapper.ConfigurationGenerator.PropertySyntax.Kind
+namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax.Kind
 {
     public interface ISyntaxKindManager
     {

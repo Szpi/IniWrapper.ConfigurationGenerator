@@ -8,6 +8,8 @@
         public string MainConfiguration { get; }
         public int BufferSize { get; }
         public char ListSeparator { get; }
+
+        public bool GenerateIniOptionAttribute { get; } = false;
         public char ComplexDataSeparator { get; } = '_';
 
         public GeneratorConfiguration(string filePath,
@@ -15,7 +17,8 @@
                                       string nameSpace,
                                       string mainConfiguration,
                                       int bufferSize,
-                                      char listSeparator)
+                                      char listSeparator, 
+                                      bool generateIniOptionAttribute)
         {
             FilePath = filePath;
             OutputFolder = outputFolder;
@@ -23,6 +26,7 @@
             MainConfiguration = mainConfiguration;
             BufferSize = bufferSize;
             ListSeparator = listSeparator;
+            GenerateIniOptionAttribute = generateIniOptionAttribute;
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
-using IniWrapper.ConfigurationGenerator.PropertySyntax.Kind;
+using IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax.Kind;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace IniWrapper.ConfigurationGenerator.PropertySyntax
+namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax
 {
     public class ListPropertyDeclarationSyntaxGenerator
     {
@@ -18,34 +17,34 @@ namespace IniWrapper.ConfigurationGenerator.PropertySyntax
             _listSeparator = listSeparator;
         }
 
-        public PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName, string iniValue, SyntaxKind syntaxKind)
+        public PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName, string iniValue)
         {
             var valueType = GetBestSyntaxKind(iniValue);
 
-            return PropertyDeclaration(
-                       GenericName(
-                               Identifier("List"))
+            return SyntaxFactory.PropertyDeclaration(
+                       SyntaxFactory.GenericName(
+                               SyntaxFactory.Identifier("List"))
                            .WithTypeArgumentList(
-                               TypeArgumentList(
-                                   SingletonSeparatedList<TypeSyntax>(
-                                       PredefinedType(
-                                           Token(valueType))))),
-                       Identifier(propertyName))
+                               SyntaxFactory.TypeArgumentList(
+                                   SyntaxFactory.SingletonSeparatedList<TypeSyntax>(
+                                       SyntaxFactory.PredefinedType(
+                                           SyntaxFactory.Token(valueType))))),
+                       SyntaxFactory.Identifier(propertyName))
                    .WithModifiers(
-                       TokenList(
-                           Token(SyntaxKind.PublicKeyword)))
+                       SyntaxFactory.TokenList(
+                           SyntaxFactory.Token(SyntaxKind.PublicKeyword)))
                    .WithAccessorList(
-                       AccessorList(
-                           List<AccessorDeclarationSyntax>(
+                       SyntaxFactory.AccessorList(
+                           SyntaxFactory.List<AccessorDeclarationSyntax>(
                                new AccessorDeclarationSyntax[]{
-                                   AccessorDeclaration(
+                                   SyntaxFactory.AccessorDeclaration(
                                            SyntaxKind.GetAccessorDeclaration)
                                        .WithSemicolonToken(
-                                           Token(SyntaxKind.SemicolonToken)),
-                                   AccessorDeclaration(
+                                           SyntaxFactory.Token(SyntaxKind.SemicolonToken)),
+                                   SyntaxFactory.AccessorDeclaration(
                                            SyntaxKind.SetAccessorDeclaration)
                                        .WithSemicolonToken(
-                                           Token(SyntaxKind.SemicolonToken))})));
+                                           SyntaxFactory.Token(SyntaxKind.SemicolonToken))})));
         }
 
         private SyntaxKind GetBestSyntaxKind(string iniValue)
