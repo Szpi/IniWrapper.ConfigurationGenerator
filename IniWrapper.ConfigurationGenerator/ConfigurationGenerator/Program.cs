@@ -15,7 +15,7 @@ namespace ConfigurationGenerator
         [Required]
         public string FilePath { get; }
 
-        [Option("-o|--output <directory_path>", "Path directory where new file will be generated", CommandOptionType.SingleValue)]
+        [Option("-o|--output <directory_path>", "Path directory where new files will be generated", CommandOptionType.SingleValue)]
         [Required]
         public string OutputFolder { get; }
 
