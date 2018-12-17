@@ -1,10 +1,15 @@
 # IniWrapper.ConfigurationGenerator
 If you are using [IniWrapper](https://github.com/Szpi/IniWrapper) this console application will help you generate classes to easier write/read from .ini file.
 
+## Quick start
+Run from command line: dotnet ConfigurationGenerator.dll -h to see help description:
+
 ![Configuration Generator](./Readme/CommandLine.PNG)
 
+You need to pass two parameter -f|--file <file_path> and -o|--output <directory_path> other are optional.
 
-Example of generated code:
+
+## Example of generated code:
 
 ```csharp
 using System.Collections.Generic;
