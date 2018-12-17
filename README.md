@@ -1,7 +1,7 @@
 # IniWrapper.ConfigurationGenerator
 If you are using [IniWrapper](https://github.com/Szpi/IniWrapper) this console application will help you generate classes to easier write/read from .ini file.
 
-[Configuration Generator](./Readme/CommandLine.PNG)
+![Configuration Generator](./Readme/CommandLine.PNG)
 
 
 Example of generated code:
