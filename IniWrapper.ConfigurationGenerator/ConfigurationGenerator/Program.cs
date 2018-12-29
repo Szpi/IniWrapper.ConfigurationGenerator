@@ -36,6 +36,10 @@ namespace ConfigurationGenerator
             CommandOptionType.SingleValue)]
         public bool GenerateIniOptionAttribute { get; } = false;
 
+        [Option("-i|--immutable <bool>", "Values (true/false or 1/0) Determines if generate immutable configuration (default false)",
+            CommandOptionType.SingleValue)]
+        public bool ImmutableConfiguration { get; } = false;
+
         private void OnExecute()
         {
             if (!Directory.Exists(FilePath))
@@ -60,7 +64,8 @@ namespace ConfigurationGenerator
                                                            MainConfiguration,
                                                            BufferSize,
                                                            ListSeparator.ToCharArray().FirstOrDefault(),
-                                                           GenerateIniOptionAttribute);
+                                                           GenerateIniOptionAttribute,
+                                                           ImmutableConfiguration);
 
             var generator = new IniWrapperConfigurationGeneratorFactory().Create(configuration);
 
