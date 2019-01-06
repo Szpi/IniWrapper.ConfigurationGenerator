@@ -18,18 +18,23 @@ namespace IniWrapper.ConfigurationGenerator.Ini.Using
             _generatorConfiguration = generatorConfiguration;
         }
 
-        public IReadOnlyList<string> AnalyzeIniFileNecessaryUsings(IReadOnlyList<PropertyDescriptor> propertiesDescriptor)
+        public IReadOnlyList<string> AnalyzeIniFileNecessaryUsings(IReadOnlyList<PropertyDescriptor> propertyDescriptors)
         {
-            return AnalyzeInternal(propertiesDescriptor);
+            var necessaryUsings = new List<string>();
+            AnalyzeIniWrapperUsing(necessaryUsings);
+
+            if (propertyDescriptors.Any(x => x.SyntaxKind == SyntaxKind.List))
+            {
+                necessaryUsings.Add(CollectionsGenericUsing);
+            }
+
+            return necessaryUsings;
         }
 
         public IReadOnlyList<string> AnalyzeIniFileNecessaryUsings(IReadOnlyList<ClassToGenerate> complexTypeToGenerates)
         {
             var necessaryUsings = new List<string>();
-            if (_generatorConfiguration.GenerateIniOptionAttribute)
-            {
-                necessaryUsings.Add(IniWrapperUsing);
-            }
+            AnalyzeIniWrapperUsing(necessaryUsings);
 
             if (complexTypeToGenerates.Any())
             {
@@ -39,20 +44,12 @@ namespace IniWrapper.ConfigurationGenerator.Ini.Using
             return necessaryUsings;
         }
 
-        private IReadOnlyList<string> AnalyzeInternal(IReadOnlyList<PropertyDescriptor> propertyDescriptors)
+        private void AnalyzeIniWrapperUsing(List<string> necessaryUsings)
         {
-            var necessaryUsings = new List<string>();
-            if (_generatorConfiguration.GenerateIniOptionAttribute)
+            if (_generatorConfiguration.GenerateIniOptionAttribute || _generatorConfiguration.ImmutableConfiguration)
             {
                 necessaryUsings.Add(IniWrapperUsing);
             }
-
-            if (propertyDescriptors.Any(x => x.SyntaxKind == SyntaxKind.List))
-            {
-                necessaryUsings.Add(CollectionsGenericUsing);
-            }
-
-            return necessaryUsings;
         }
     }
 }

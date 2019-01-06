@@ -13,6 +13,12 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax
         {
             return ConstructorDeclaration(
                     Identifier(className))
+                   .WithAttributeLists(
+                       SingletonList<AttributeListSyntax>(
+                           AttributeList(
+                               SingletonSeparatedList<AttributeSyntax>(
+                                   Attribute(
+                                       IdentifierName("IniConstructor"))))))
                 .WithModifiers(
                     TokenList(
                         Token(SyntaxKind.PublicKeyword)))
