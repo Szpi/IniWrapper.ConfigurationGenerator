@@ -6,11 +6,13 @@ namespace IniWrapper.ConfigurationGenerator.Ini.Class
     {
         public string Name { get;}
         public SyntaxKind SyntaxKind { get;}
+        public SyntaxKind UnderlyingSyntaxKind { get; }
 
-        public PropertyDescriptor(string name, SyntaxKind syntaxKind)
+        public PropertyDescriptor(string name, SyntaxKind syntaxKind, SyntaxKind underlyingSyntaxKind)
         {
             Name = name;
             SyntaxKind = syntaxKind;
+            UnderlyingSyntaxKind = underlyingSyntaxKind;
         }
     }
 }

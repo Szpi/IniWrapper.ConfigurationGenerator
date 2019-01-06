@@ -17,18 +17,16 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax
             _listSeparator = listSeparator;
         }
 
-        public PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName, string iniValue)
+        public PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName, SyntaxKind underlyingSyntaxKind)
         {
-            var valueType = GetBestSyntaxKind(iniValue);
+            var typeSyntax = GetTypeSyntax(propertyName, underlyingSyntaxKind);
 
             return SyntaxFactory.PropertyDeclaration(
                        SyntaxFactory.GenericName(
                                SyntaxFactory.Identifier("List"))
                            .WithTypeArgumentList(
                                SyntaxFactory.TypeArgumentList(
-                                   SyntaxFactory.SingletonSeparatedList<TypeSyntax>(
-                                       SyntaxFactory.PredefinedType(
-                                           SyntaxFactory.Token(valueType))))),
+                                   SyntaxFactory.SingletonSeparatedList<TypeSyntax>(typeSyntax))),
                        SyntaxFactory.Identifier(propertyName))
                    .WithModifiers(
                        SyntaxFactory.TokenList(
@@ -47,15 +45,12 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax
                                            SyntaxFactory.Token(SyntaxKind.SemicolonToken))})));
         }
 
-        private SyntaxKind GetBestSyntaxKind(string iniValue)
+        private static TypeSyntax GetTypeSyntax(string propertyName, SyntaxKind underlyingSyntaxKind)
         {
-            var splitValues = iniValue.Split(new[] {_listSeparator}, StringSplitOptions.RemoveEmptyEntries);
-
-            var splitValuesSyntaxKind = splitValues.Select(x => _syntaxKindManager.GetSyntaxKind(x)).Distinct().ToList();
-
-            return splitValuesSyntaxKind.Count() > 1
-                ? SyntaxKind.StringKeyword
-                : splitValuesSyntaxKind.FirstOrDefault();
+            return underlyingSyntaxKind == SyntaxKind.None
+                ? SyntaxFactory.IdentifierName(propertyName) as TypeSyntax
+                : SyntaxFactory.PredefinedType(
+                    SyntaxFactory.Token(underlyingSyntaxKind));
         }
     }
 }

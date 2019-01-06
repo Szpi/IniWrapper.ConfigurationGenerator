@@ -4,6 +4,6 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax.Kind
 {
     public interface ISyntaxKindManager
     {
-        SyntaxKind GetSyntaxKind(string value);
+        (SyntaxKind syntaxKind, SyntaxKind underlyingSyntaxKind) GetSyntaxKind(string value);
     }
 }

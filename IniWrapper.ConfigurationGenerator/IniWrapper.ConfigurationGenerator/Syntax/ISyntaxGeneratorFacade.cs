@@ -6,17 +6,16 @@ namespace IniWrapper.ConfigurationGenerator.Syntax
 {
     public interface ISyntaxGeneratorFacade
     {
+        UsingDirectiveSyntax GetUsingSyntax(string @using);
+        PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName, SyntaxKind syntaxKind);
+        ClassDeclarationSyntax GetClassSyntax(string className);
+        PropertyDeclarationSyntax GetListPropertyDeclarationSyntax(string propertyName, SyntaxKind syntaxKind);
+
+
         PropertyDeclarationSyntax AddIniOptionsAttributeToProperty(string section, string key, PropertyDeclarationSyntax property);
-        UsingDirectiveSyntax GetCollectionsGenericUsingSyntax();
-        PropertyDeclarationSyntax GetComplexListPropertyDeclarationSyntax(string propertyName);
-        UsingDirectiveSyntax GetIniWrapperAttributeUsingSyntax();
-        PropertyDeclarationSyntax GetListPropertyDeclarationSyntax(string propertyName, string iniValue);
-        PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName, string iniValue, SyntaxKind syntaxKind);
         PropertyDeclarationSyntax GetClassPropertyDeclarationSyntax(string iniLine);
 
-        CompilationUnitSyntax GetClassSyntax(string sectionName,
-                                             SyntaxList<MemberDeclarationSyntax> members,
-                                             SyntaxList<UsingDirectiveSyntax> usingDirectiveSyntax,
-                                             string nameSpace);
+
+        CompilationUnitSyntax GetCompilationUnitSyntax();
     }
 }

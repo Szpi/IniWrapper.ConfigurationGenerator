@@ -3,16 +3,12 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace IniWrapper.ConfigurationGenerator.Syntax.UsingSyntax
 {
-    public class CollectionsGenericUsingSyntaxGenerator
+    public class UsingSyntaxGenerator
     {
-        public UsingDirectiveSyntax GetCollectionsGenericUsingSyntax()
+        public UsingDirectiveSyntax GetUsingSyntax(string @using)
         {
             return SyntaxFactory.UsingDirective(
-                       SyntaxFactory.QualifiedName(
-                           SyntaxFactory.QualifiedName(
-                               SyntaxFactory.IdentifierName("System"),
-                               SyntaxFactory.IdentifierName("Collections")),
-                           SyntaxFactory.IdentifierName("Generic")))
+                           SyntaxFactory.IdentifierName(@using))
                    .WithUsingKeyword(
                        SyntaxFactory.Token(
                            SyntaxFactory.TriviaList(),

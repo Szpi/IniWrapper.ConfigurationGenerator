@@ -5,7 +5,7 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax
 {
     public class PropertyDeclarationSyntaxGenerator
     {
-        public PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName, string iniValue, SyntaxKind syntaxKind)
+        public PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName, SyntaxKind syntaxKind)
         {
             return SyntaxFactory.PropertyDeclaration(
                         SyntaxFactory.PredefinedType(

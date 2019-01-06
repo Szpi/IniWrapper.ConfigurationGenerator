@@ -23,7 +23,7 @@ namespace IniWrapper.ConfigurationGenerator.Ini.Using
             return AnalyzeInternal(propertiesDescriptor);
         }
 
-        public IReadOnlyList<string> AnalyzeIniFileNecessaryUsings(IReadOnlyList<ComplexTypeToGenerate> complexTypeToGenerates)
+        public IReadOnlyList<string> AnalyzeIniFileNecessaryUsings(IReadOnlyList<ClassToGenerate> complexTypeToGenerates)
         {
             var necessaryUsings = new List<string>();
             if (_generatorConfiguration.GenerateIniOptionAttribute)

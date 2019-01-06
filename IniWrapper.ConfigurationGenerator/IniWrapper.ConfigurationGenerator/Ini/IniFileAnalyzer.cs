@@ -39,16 +39,16 @@ namespace IniWrapper.ConfigurationGenerator.Ini
             return new IniFileContext(classesToGenerate, complexClassesToGenerate, usingsToGenerate);
         }
 
-        private List<ComplexTypeToGenerate> AnalyzeComplexDataSections(List<string> complexDataSections)
+        private List<ClassToGenerate> AnalyzeComplexDataSections(List<string> complexDataSections)
         {
-            var complexTypeToGenerates = new List<ComplexTypeToGenerate>();
+            var complexTypeToGenerates = new List<ClassToGenerate>();
 
             foreach (var complexSection in complexDataSections)
             {
                 var iniValues = _iniParserWrapper.ReadAllFromSection(complexSection);
                 var propertiesDescriptor = AnalyzeIniValues(iniValues);
                 var necessaryUsings = _iniFileUsingsAnalyzer.AnalyzeIniFileNecessaryUsings(propertiesDescriptor);
-                var classToGenerate = new ComplexTypeToGenerate(complexSection, propertiesDescriptor, necessaryUsings);
+                var classToGenerate = new ClassToGenerate(complexSection, propertiesDescriptor, necessaryUsings);
                 complexTypeToGenerates.Add(classToGenerate);
             }
 
@@ -61,7 +61,7 @@ namespace IniWrapper.ConfigurationGenerator.Ini
             foreach (var iniValue in iniValues)
             {
                 var syntaxKind = _syntaxKindManager.GetSyntaxKind(iniValue.Value);
-                var property = new PropertyDescriptor(iniValue.Key, syntaxKind);
+                var property = new PropertyDescriptor(iniValue.Key, syntaxKind.syntaxKind, syntaxKind.underlyingSyntaxKind);
                 propertiesDescriptor.Add(property);
             }
 
