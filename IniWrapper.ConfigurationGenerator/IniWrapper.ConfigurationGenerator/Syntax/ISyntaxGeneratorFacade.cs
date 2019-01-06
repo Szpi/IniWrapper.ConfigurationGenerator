@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Generic;
+using IniWrapper.ConfigurationGenerator.Ini.Class;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -13,5 +15,7 @@ namespace IniWrapper.ConfigurationGenerator.Syntax
         SyntaxList<AttributeListSyntax> GetAttributeSyntax(string section, string key);
         CompilationUnitSyntax GetCompilationUnitSyntax();
         NamespaceDeclarationSyntax GetNamespace(string @namespace);
+
+        ConstructorDeclarationSyntax GetConstructorDeclarationSyntax(string className, IReadOnlyList<PropertyDescriptor> propertyDescriptors);
     }
 }

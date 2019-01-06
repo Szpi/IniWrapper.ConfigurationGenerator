@@ -1,22 +1,10 @@
-﻿using System;
-using System.Linq;
-using IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax.Kind;
-using Microsoft.CodeAnalysis.CSharp;
+﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax
 {
-    public class ListPropertyDeclarationSyntaxGenerator
+    public class ListPropertyDeclarationSyntaxGenerator : IListPropertyDeclarationSyntaxGenerator
     {
-        private readonly ISyntaxKindManager _syntaxKindManager;
-        private readonly char _listSeparator;
-
-        public ListPropertyDeclarationSyntaxGenerator(ISyntaxKindManager syntaxKindManager, char listSeparator)
-        {
-            _syntaxKindManager = syntaxKindManager;
-            _listSeparator = listSeparator;
-        }
-
         public PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName, SyntaxKind underlyingSyntaxKind)
         {
             var typeSyntax = GetTypeSyntax(propertyName, underlyingSyntaxKind);
@@ -45,12 +33,12 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax
                                            SyntaxFactory.Token(SyntaxKind.SemicolonToken))})));
         }
 
-        private static TypeSyntax GetTypeSyntax(string propertyName, SyntaxKind underlyingSyntaxKind)
+        public static TypeSyntax GetTypeSyntax(string propertyName, SyntaxKind syntaxKind)
         {
-            return underlyingSyntaxKind == SyntaxKind.ClassDeclaration
+            return syntaxKind == SyntaxKind.ClassDeclaration
                 ? SyntaxFactory.IdentifierName(propertyName) as TypeSyntax
                 : SyntaxFactory.PredefinedType(
-                    SyntaxFactory.Token(underlyingSyntaxKind));
+                    SyntaxFactory.Token(syntaxKind));
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using IniWrapper.ConfigurationGenerator.Syntax.Class;
+﻿using System.Collections.Generic;
+using IniWrapper.ConfigurationGenerator.Ini.Class;
+using IniWrapper.ConfigurationGenerator.Syntax.Class;
 using IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax;
 using IniWrapper.ConfigurationGenerator.Syntax.UsingSyntax;
 using Microsoft.CodeAnalysis;
@@ -10,22 +12,25 @@ namespace IniWrapper.ConfigurationGenerator.Syntax
     public class SyntaxGeneratorFacade : ISyntaxGeneratorFacade
     {
         private readonly UsingSyntaxGenerator _usingSyntaxGenerator;
-        private readonly PropertyDeclarationSyntaxGenerator _propertyDeclarationSyntaxGenerator;
+        private readonly IPropertyDeclarationSyntaxGenerator _propertyDeclarationSyntaxGenerator;
         private readonly ClassDeclarationSyntaxGenerator _classDeclarationSyntaxGenerator;
-        private readonly ListPropertyDeclarationSyntaxGenerator _listPropertyDeclarationSyntaxGenerator;
+        private readonly IListPropertyDeclarationSyntaxGenerator _listPropertyDeclarationSyntaxGenerator;
         private readonly IniOptionsAttributeSyntaxGenerator _iniOptionsAttributeSyntaxGenerator;
+        private readonly ConstructorDeclarationSyntaxGenerator _constructorDeclarationSyntaxGenerator;
 
         public SyntaxGeneratorFacade(IniOptionsAttributeSyntaxGenerator iniOptionsAttributeSyntaxGenerator,
-                                     ListPropertyDeclarationSyntaxGenerator listPropertyDeclarationSyntaxGenerator,
-                                     PropertyDeclarationSyntaxGenerator propertyDeclarationSyntaxGenerator,
+                                     IListPropertyDeclarationSyntaxGenerator listPropertyDeclarationSyntaxGenerator,
+                                     IPropertyDeclarationSyntaxGenerator propertyDeclarationSyntaxGenerator,
                                      UsingSyntaxGenerator usingSyntaxGenerator,
-                                     ClassDeclarationSyntaxGenerator classDeclarationSyntaxGenerator)
+                                     ClassDeclarationSyntaxGenerator classDeclarationSyntaxGenerator, 
+                                     ConstructorDeclarationSyntaxGenerator constructorDeclarationSyntaxGenerator)
         {
             _iniOptionsAttributeSyntaxGenerator = iniOptionsAttributeSyntaxGenerator;
             _listPropertyDeclarationSyntaxGenerator = listPropertyDeclarationSyntaxGenerator;
             _propertyDeclarationSyntaxGenerator = propertyDeclarationSyntaxGenerator;
             _usingSyntaxGenerator = usingSyntaxGenerator;
             _classDeclarationSyntaxGenerator = classDeclarationSyntaxGenerator;
+            _constructorDeclarationSyntaxGenerator = constructorDeclarationSyntaxGenerator;
         }
 
         public UsingDirectiveSyntax GetUsingSyntax(string @using)
@@ -61,6 +66,11 @@ namespace IniWrapper.ConfigurationGenerator.Syntax
         public NamespaceDeclarationSyntax GetNamespace(string @namespace)
         {
             return SyntaxFactory.NamespaceDeclaration(SyntaxFactory.IdentifierName(@namespace));
+        }
+
+        public ConstructorDeclarationSyntax GetConstructorDeclarationSyntax(string className, IReadOnlyList<PropertyDescriptor> propertyDescriptors)
+        {
+            return _constructorDeclarationSyntaxGenerator.GetConstructorDeclarationSyntax(className, propertyDescriptors);
         }
     }
 }

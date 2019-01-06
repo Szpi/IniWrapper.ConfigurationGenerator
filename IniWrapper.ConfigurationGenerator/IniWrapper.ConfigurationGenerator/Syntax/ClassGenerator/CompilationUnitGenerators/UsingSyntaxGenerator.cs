@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator.CompilationUnitGenerators
 {
-    public class UsingSyntaxGenerator : IClassToGenerateGenerator
+    public class UsingSyntaxGenerator : ICompilationUnitGenerator
     {
         private readonly ISyntaxGeneratorFacade _syntaxGeneratorFacade;
 

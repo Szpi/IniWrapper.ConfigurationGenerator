@@ -10,9 +10,11 @@ using IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator.ClassDeclarationGe
 using IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator.PropertyDeclarationModifiers;
 using IniWrapper.ConfigurationGenerator.Syntax.Generators;
 using IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax;
+using IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax.Immutable;
 using IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax.Kind;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using ICompilationUnitGenerator = IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator.ICompilationUnitGenerator;
 using UsingSyntaxGenerator = IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator.CompilationUnitGenerators.UsingSyntaxGenerator;
 
 namespace IniWrapper.ConfigurationGenerator.Factory
@@ -24,11 +26,7 @@ namespace IniWrapper.ConfigurationGenerator.Factory
             var iniWrapper = new IniParserWrapper(configuration.FilePath, configuration.BufferSize, new ReadSectionsParser());
             var syntaxManager = new SyntaxKindManager(configuration.ListSeparator);
 
-            var syntaxGeneratorFacade = new SyntaxGeneratorFacade(new IniOptionsAttributeSyntaxGenerator(),
-                                                                    new ListPropertyDeclarationSyntaxGenerator(syntaxManager, configuration.ListSeparator),
-                                                                    new PropertyDeclarationSyntaxGenerator(),
-                                                                    new Syntax.UsingSyntax.UsingSyntaxGenerator(),
-                                                                    new ClassDeclarationSyntaxGenerator());
+            var syntaxGeneratorFacade = GetSyntaxGeneratorFacade(configuration);
 
             var iniFileAnalyzer = new IniFileAnalyzer(iniWrapper,
                                                       new SectionsAnalyzer(configuration.ComplexDataSeparator),
@@ -40,24 +38,50 @@ namespace IniWrapper.ConfigurationGenerator.Factory
             var classDeclarationGenerators = new List<IClassDeclarationGenerator>()
             {
                 new PropertySyntaxGenerator(syntaxGeneratorFacade, attributePropertyModifier),
-                new PropertyListSyntaxGenerator(syntaxGeneratorFacade,attributePropertyModifier)
+                new PropertyListSyntaxGenerator(syntaxGeneratorFacade,attributePropertyModifier),
+
             };
 
-            var classToGenerateGenerators = new List<IClassToGenerateGenerator>()
+            if (configuration.ImmutableConfiguration)
+            {
+                classDeclarationGenerators.Add(new ConstructorSyntaxGenerator(syntaxGeneratorFacade));
+            }
+
+            var compilationUnitGenerators = new List<ICompilationUnitGenerator>()
             {
                 new UsingSyntaxGenerator(syntaxGeneratorFacade),
                 new ClassSyntaxGenerator(syntaxGeneratorFacade,classDeclarationGenerators, configuration.NameSpace)
             };
 
-            var syntaxGenerators = new List<ICompilationUnitGenerator>()
+            var syntaxGenerators = new List<Syntax.Generators.ICompilationUnitGenerator>()
             {
-                new ClassCompilationUnitGenerator(classToGenerateGenerators.AsReadOnly(), syntaxGeneratorFacade)
+                new ClassCompilationUnitGenerator(compilationUnitGenerators.AsReadOnly(), syntaxGeneratorFacade)
             };
 
             return new IniWrapperConfigurationGenerator(syntaxGenerators,
                                                         iniFileAnalyzer,
                                                         new FileSystem(),
                                                         configuration);
+        }
+
+        private static SyntaxGeneratorFacade GetSyntaxGeneratorFacade(GeneratorConfiguration configuration)
+        {
+            if (configuration.ImmutableConfiguration)
+            {
+                return new SyntaxGeneratorFacade(new IniOptionsAttributeSyntaxGenerator(),
+                                                 new ImmutableListPropertyDeclarationSyntaxGenerator(),
+                                                 new ImmutablePropertyDeclarationSyntaxGenerator(),
+                                                 new Syntax.UsingSyntax.UsingSyntaxGenerator(),
+                                                 new ClassDeclarationSyntaxGenerator(),
+                                                 new ConstructorDeclarationSyntaxGenerator());
+            }
+
+            return new SyntaxGeneratorFacade(new IniOptionsAttributeSyntaxGenerator(),
+                                             new ListPropertyDeclarationSyntaxGenerator(),
+                                             new PropertyDeclarationSyntaxGenerator(),
+                                             new Syntax.UsingSyntax.UsingSyntaxGenerator(),
+                                             new ClassDeclarationSyntaxGenerator(),
+                                             new ConstructorDeclarationSyntaxGenerator());
         }
 
         private static IPropertyDeclarationSyntaxModifier GetPropertyDeclarationSyntaxModifier(GeneratorConfiguration configuration, SyntaxGeneratorFacade syntaxGeneratorFacade)

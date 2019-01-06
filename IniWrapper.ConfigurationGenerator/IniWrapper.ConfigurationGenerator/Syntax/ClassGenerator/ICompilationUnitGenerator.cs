@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator
 {
-    public interface IClassToGenerateGenerator
+    public interface ICompilationUnitGenerator
     {
         CompilationUnitSyntax Generate(CompilationUnitSyntax compilationUnitSyntax, ClassToGenerate classToGenerate);
     }

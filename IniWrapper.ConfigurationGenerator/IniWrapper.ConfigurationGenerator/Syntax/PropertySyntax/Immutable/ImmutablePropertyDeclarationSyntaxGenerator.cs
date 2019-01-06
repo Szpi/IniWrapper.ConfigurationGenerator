@@ -1,16 +1,14 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax
+namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax.Immutable
 {
-    public class PropertyDeclarationSyntaxGenerator : IPropertyDeclarationSyntaxGenerator
+    public class ImmutablePropertyDeclarationSyntaxGenerator : IPropertyDeclarationSyntaxGenerator
     {
         public PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName, SyntaxKind syntaxKind)
         {
             var typeSyntax = ListPropertyDeclarationSyntaxGenerator.GetTypeSyntax(propertyName, syntaxKind);
-
-            return SyntaxFactory.PropertyDeclaration(
-                                    typeSyntax,
+            return SyntaxFactory.PropertyDeclaration(typeSyntax,
                         SyntaxFactory.Identifier(
                             SyntaxFactory.TriviaList(),
                             propertyName,
@@ -30,10 +28,6 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax
                                     {
                                         SyntaxFactory.AccessorDeclaration(
                                                 SyntaxKind.GetAccessorDeclaration)
-                                            .WithSemicolonToken(
-                                                SyntaxFactory.Token(SyntaxKind.SemicolonToken)),
-                                        SyntaxFactory.AccessorDeclaration(
-                                                SyntaxKind.SetAccessorDeclaration)
                                             .WithSemicolonToken(
                                                 SyntaxFactory.Token(SyntaxKind.SemicolonToken))
                                     }))

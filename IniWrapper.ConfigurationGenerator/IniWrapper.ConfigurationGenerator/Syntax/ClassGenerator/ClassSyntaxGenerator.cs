@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator
 {
-    public class ClassSyntaxGenerator : IClassToGenerateGenerator
+    public class ClassSyntaxGenerator : ICompilationUnitGenerator
     {
         private readonly ISyntaxGeneratorFacade _syntaxGeneratorFacade;
         private readonly IReadOnlyList<IClassDeclarationGenerator> _classDeclarationGenerators;

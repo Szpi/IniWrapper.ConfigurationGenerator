@@ -8,10 +8,10 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.Generators
 {
     public class ClassCompilationUnitGenerator : ICompilationUnitGenerator
     {
-        private readonly IReadOnlyList<IClassToGenerateGenerator> _classToGenerateVisitors;
+        private readonly IReadOnlyList<ClassGenerator.ICompilationUnitGenerator> _classToGenerateVisitors;
         private readonly ISyntaxGeneratorFacade _syntaxGeneratorFacade;
 
-        public ClassCompilationUnitGenerator(IReadOnlyList<IClassToGenerateGenerator> classToGenerateVisitors, ISyntaxGeneratorFacade syntaxGeneratorFacade)
+        public ClassCompilationUnitGenerator(IReadOnlyList<ClassGenerator.ICompilationUnitGenerator> classToGenerateVisitors, ISyntaxGeneratorFacade syntaxGeneratorFacade)
         {
             _classToGenerateVisitors = classToGenerateVisitors;
             _syntaxGeneratorFacade = syntaxGeneratorFacade;
