@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using IniWrapper.ConfigurationGenerator.Ini.Class;
 using IniWrapper.ConfigurationGenerator.Ini.Using;
 using IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax.Kind;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace IniWrapper.ConfigurationGenerator.Ini
 {
@@ -14,16 +15,19 @@ namespace IniWrapper.ConfigurationGenerator.Ini
 
         private readonly ISyntaxKindManager _syntaxKindManager;
         private readonly IIniFileUsingsAnalyzer _iniFileUsingsAnalyzer;
+        private readonly string _mainClassName;
 
         public IniFileAnalyzer(IIniParserWrapper iniParserWrapper,
                                ISectionsAnalyzer sectionsAnalyzer,
                                ISyntaxKindManager syntaxKindManager, 
-                               IIniFileUsingsAnalyzer iniFileUsingsAnalyzer)
+                               IIniFileUsingsAnalyzer iniFileUsingsAnalyzer, 
+                               string mainClassName)
         {
             _iniParserWrapper = iniParserWrapper;
             _sectionsAnalyzer = sectionsAnalyzer;
             _syntaxKindManager = syntaxKindManager;
             _iniFileUsingsAnalyzer = iniFileUsingsAnalyzer;
+            _mainClassName = mainClassName;
         }
 
         public IniFileContext AnalyzeIniFile()
@@ -35,20 +39,43 @@ namespace IniWrapper.ConfigurationGenerator.Ini
             var complexClassesToGenerate = AnalyzeComplexDataSections(complexDataSections);
             var usingsToGenerate = _iniFileUsingsAnalyzer.AnalyzeIniFileNecessaryUsings(complexClassesToGenerate);
 
+            var propertiesInMainClass = AnalyzePropertiesInMainClass(classesToGenerate, complexClassesToGenerate);
+            var mainClassToGenerate = new ClassToGenerate(_mainClassName, propertiesInMainClass, usingsToGenerate);
 
-            return new IniFileContext(classesToGenerate, complexClassesToGenerate, usingsToGenerate);
+            classesToGenerate.Add(mainClassToGenerate);
+            return new IniFileContext(classesToGenerate, complexClassesToGenerate);
         }
 
-        private List<ClassToGenerate> AnalyzeComplexDataSections(List<string> complexDataSections)
+        private IReadOnlyList<PropertyDescriptor> AnalyzePropertiesInMainClass(List<ClassToGenerate> classesToGenerate, List<ClassToGenerate> complexClassesToGenerate)
+        {
+            var propertiesDescriptor = new List<PropertyDescriptor>();
+            foreach (var classToGenerate in classesToGenerate)
+            {
+                var propertyDescriptor = new PropertyDescriptor(classToGenerate.ClassName, SyntaxKind.ClassDeclaration, SyntaxKind.None);
+
+                propertiesDescriptor.Add(propertyDescriptor);
+            }
+
+            foreach (var classToGenerate in complexClassesToGenerate)
+            {
+                var propertyDescriptor = new PropertyDescriptor(classToGenerate.ClassName, SyntaxKind.List, SyntaxKind.ClassDeclaration);
+
+                propertiesDescriptor.Add(propertyDescriptor);
+            }
+
+            return propertiesDescriptor;
+        }
+
+        private List<ClassToGenerate> AnalyzeComplexDataSections(List<(string className, string firstSectionInIniFile)> complexDataSections)
         {
             var complexTypeToGenerates = new List<ClassToGenerate>();
 
-            foreach (var complexSection in complexDataSections)
+            foreach (var (complexClassName, firstIniSection) in complexDataSections)
             {
-                var iniValues = _iniParserWrapper.ReadAllFromSection(complexSection);
+                var iniValues = _iniParserWrapper.ReadAllFromSection(firstIniSection);
                 var propertiesDescriptor = AnalyzeIniValues(iniValues);
                 var necessaryUsings = _iniFileUsingsAnalyzer.AnalyzeIniFileNecessaryUsings(propertiesDescriptor);
-                var classToGenerate = new ClassToGenerate(complexSection, propertiesDescriptor, necessaryUsings);
+                var classToGenerate = new ClassToGenerate(complexClassName, propertiesDescriptor, necessaryUsings);
                 complexTypeToGenerates.Add(classToGenerate);
             }
 

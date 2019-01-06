@@ -17,7 +17,7 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.Visitor.ClassDeclarationVisit
         public ClassDeclarationSyntax Accept(ClassDeclarationSyntax classDeclarationSyntax, ClassToGenerate classToGenerate)
         {
             return classToGenerate.PropertyDescriptors
-                                  .Where(propertyDescriptor => propertyDescriptor.SyntaxKind != SyntaxKind.List)
+                                  .Where(propertyDescriptor => propertyDescriptor.SyntaxKind != SyntaxKind.List && propertyDescriptor.SyntaxKind != SyntaxKind.ClassDeclaration)
                                   .Select(propertyDescriptor => _syntaxGeneratorFacade.GetPropertyDeclarationSyntax(propertyDescriptor.Name, propertyDescriptor.SyntaxKind))
                                   .Aggregate(classDeclarationSyntax, (current, propertySyntax) => current.AddMembers(propertySyntax));
         }

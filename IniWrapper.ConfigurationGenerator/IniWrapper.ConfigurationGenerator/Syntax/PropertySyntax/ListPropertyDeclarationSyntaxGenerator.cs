@@ -47,7 +47,7 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax
 
         private static TypeSyntax GetTypeSyntax(string propertyName, SyntaxKind underlyingSyntaxKind)
         {
-            return underlyingSyntaxKind == SyntaxKind.None
+            return underlyingSyntaxKind == SyntaxKind.ClassDeclaration
                 ? SyntaxFactory.IdentifierName(propertyName) as TypeSyntax
                 : SyntaxFactory.PredefinedType(
                     SyntaxFactory.Token(underlyingSyntaxKind));

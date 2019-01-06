@@ -4,6 +4,6 @@ namespace IniWrapper.ConfigurationGenerator.Section
 {
     public interface ISectionsAnalyzer
     {
-        (List<string> SeparateSections, List<string> ComplexDataSections) AnalyzeSections(IEnumerable<string> sections);
+        (List<string> SeparateSections, List<(string className, string firstSectionInIniFile)> ComplexDataSections) AnalyzeSections(IEnumerable<string> sections);
     }
 }

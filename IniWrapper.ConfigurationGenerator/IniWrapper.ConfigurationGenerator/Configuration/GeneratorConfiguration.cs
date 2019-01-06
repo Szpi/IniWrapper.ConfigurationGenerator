@@ -5,7 +5,7 @@
         public string FilePath { get; }
         public string OutputFolder { get; }
         public string NameSpace { get; }
-        public string MainConfiguration { get; }
+        public string MainConfigurationClassName { get; }
         public int BufferSize { get; }
         public char ListSeparator { get; }
 
@@ -16,7 +16,7 @@
         public GeneratorConfiguration(string filePath,
                                       string outputFolder,
                                       string nameSpace,
-                                      string mainConfiguration,
+                                      string mainConfigurationClassName,
                                       int bufferSize,
                                       char listSeparator,
                                       bool generateIniOptionAttribute,
@@ -25,7 +25,7 @@
             FilePath = filePath;
             OutputFolder = outputFolder;
             NameSpace = nameSpace;
-            MainConfiguration = mainConfiguration;
+            MainConfigurationClassName = mainConfigurationClassName;
             BufferSize = bufferSize;
             ListSeparator = listSeparator;
             GenerateIniOptionAttribute = generateIniOptionAttribute;

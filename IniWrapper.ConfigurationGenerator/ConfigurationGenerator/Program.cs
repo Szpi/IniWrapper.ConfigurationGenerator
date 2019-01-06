@@ -22,8 +22,8 @@ namespace ConfigurationGenerator
         [Option("-n|--namespace <namespace>", "Namespace that will be used for all generated classes (default value 'Configuration')", CommandOptionType.SingleValue)]
         public string NameSpace { get; } = "Configuration";
 
-        [Option("-m|--mainclass <class_name>", "Main configuration class name that will contain all section classes (default value 'MainConfiguration')", CommandOptionType.SingleValue)]
-        public string MainConfiguration { get; } = "MainConfiguration";
+        [Option("-m|--mainclass <class_name>", "Main configuration class name that will contain all section classes (default value 'MainConfigurationClassName')", CommandOptionType.SingleValue)]
+        public string MainConfigurationClassName { get; } = "MainConfiguration";
 
         [Option("-b|--buffer <int>", "Reading buffer size (pass only when files are really big default value 100_000)", CommandOptionType.SingleValue)]
         public int BufferSize { get; } = 100_000;
@@ -61,7 +61,7 @@ namespace ConfigurationGenerator
             var configuration = new GeneratorConfiguration(pathToIniFile,
                                                            OutputFolder,
                                                            NameSpace,
-                                                           MainConfiguration,
+                                                           MainConfigurationClassName,
                                                            BufferSize,
                                                            ListSeparator.ToCharArray().FirstOrDefault(),
                                                            GenerateIniOptionAttribute,

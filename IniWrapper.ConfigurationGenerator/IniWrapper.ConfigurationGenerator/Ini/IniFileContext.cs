@@ -7,15 +7,12 @@ namespace IniWrapper.ConfigurationGenerator.Ini
     {
         public IReadOnlyList<ClassToGenerate> ClassesToGenerate { get;}
         public IReadOnlyList<ClassToGenerate> ComplexClassesToGenerate { get;}
-        public IReadOnlyList<string> UsingsToGenerate { get; }
 
         public IniFileContext(IReadOnlyList<ClassToGenerate> classesToGenerate,
-                              IReadOnlyList<ClassToGenerate> complexClassesToGenerate,
-                              IReadOnlyList<string> usingsToGenerate)
+                              IReadOnlyList<ClassToGenerate> complexClassesToGenerate)
         {
             ClassesToGenerate = classesToGenerate;
             ComplexClassesToGenerate = complexClassesToGenerate;
-            UsingsToGenerate = usingsToGenerate;
         }
     }
 }

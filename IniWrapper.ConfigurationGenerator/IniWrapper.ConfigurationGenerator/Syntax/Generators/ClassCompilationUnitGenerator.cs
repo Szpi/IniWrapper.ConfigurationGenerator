@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using IniWrapper.ConfigurationGenerator.Ini;
 using IniWrapper.ConfigurationGenerator.Syntax.Visitor;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -20,13 +21,12 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.Generators
         {
             var compilationUnitsSyntax = new List<(CompilationUnitSyntax compilationUnitsSyntax, string className)>();
 
-            foreach (var classToGenerate in iniFileContext.ClassesToGenerate)
+            foreach (var classToGenerate in iniFileContext.ClassesToGenerate.Concat(iniFileContext.ComplexClassesToGenerate))
             {
                 var compilationUnitSyntax = _syntaxGeneratorFacade.GetCompilationUnitSyntax();
-                foreach (var classToGenerateVisitor in _classToGenerateVisitors)
-                {
-                    compilationUnitSyntax = classToGenerateVisitor.Accept(compilationUnitSyntax, classToGenerate);
-                }
+                compilationUnitSyntax = _classToGenerateVisitors
+                                       .Aggregate(compilationUnitSyntax, (current, classToGenerateVisitor) => classToGenerateVisitor.Accept(current, classToGenerate));
+
                 compilationUnitsSyntax.Add((compilationUnitSyntax, classToGenerate.ClassName));
             }
             return compilationUnitsSyntax;

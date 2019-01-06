@@ -12,11 +12,11 @@ namespace IniWrapper.ConfigurationGenerator.Section
             _separator = separator;
         }
 
-        public (List<string> SeparateSections, List<string> ComplexDataSections) AnalyzeSections(IEnumerable<string> sections)
+        public (List<string> SeparateSections, List<(string className, string firstSectionInIniFile)> ComplexDataSections) AnalyzeSections(IEnumerable<string> sections)
         {
             var sortedSections = sections.ToList();
-            
-            var complexDataSections = new List<string>();
+
+            var complexDataSections = new List<(string className, string firstSectionInIniFile)>();
             var basicSections = new List<string>();
             for (var i = sortedSections.Count - 1; i >= 0; i--)
             {
@@ -30,7 +30,7 @@ namespace IniWrapper.ConfigurationGenerator.Section
 
                 var intersectedComplexDataName = section.Substring(0, lastIndexOfSeparator + 1);
 
-                complexDataSections.Add(section.Substring(0, lastIndexOfSeparator));
+                complexDataSections.Add((section.Substring(0, lastIndexOfSeparator), section));
                 var removedItems = sortedSections.RemoveAll(x => x.StartsWith(intersectedComplexDataName));
                 i -= removedItems - 1;
             }

@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
-using IniWrapper.ConfigurationGenerator.Configuration;
+﻿using IniWrapper.ConfigurationGenerator.Configuration;
 using IniWrapper.ConfigurationGenerator.Ini;
 using IniWrapper.ConfigurationGenerator.Ini.Using;
 using IniWrapper.ConfigurationGenerator.IniParser;
 using IniWrapper.ConfigurationGenerator.Section;
 using IniWrapper.ConfigurationGenerator.Syntax;
+using IniWrapper.ConfigurationGenerator.Syntax.Class;
+using IniWrapper.ConfigurationGenerator.Syntax.Generators;
 using IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax;
 using IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax.Kind;
 using IniWrapper.ConfigurationGenerator.Syntax.UsingSyntax;
-using System.IO.Abstractions;
-using IniWrapper.ConfigurationGenerator.Syntax.Class;
-using IniWrapper.ConfigurationGenerator.Syntax.Generators;
 using IniWrapper.ConfigurationGenerator.Syntax.Visitor;
 using IniWrapper.ConfigurationGenerator.Syntax.Visitor.ClassDeclarationVisitors;
 using IniWrapper.ConfigurationGenerator.Syntax.Visitor.CompilationUnitVisitors;
+using System.Collections.Generic;
+using System.IO.Abstractions;
 
 namespace IniWrapper.ConfigurationGenerator.Factory
 {
@@ -34,7 +34,8 @@ namespace IniWrapper.ConfigurationGenerator.Factory
             var iniFileAnalyzer = new IniFileAnalyzer(iniWrapper,
                                                       new SectionsAnalyzer(configuration.ComplexDataSeparator),
                                                       syntaxManager,
-                                                      new IniFileUsingsAnalyzer(configuration));
+                                                      new IniFileUsingsAnalyzer(configuration),
+                configuration.MainConfigurationClassName);
 
 
             var classDeclarationVisitors = new List<IClassDeclarationVisitor>()

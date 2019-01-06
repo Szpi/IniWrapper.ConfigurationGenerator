@@ -105,45 +105,9 @@ namespace IniWrapper.ConfigurationGenerator
             var workspace = new AdhocWorkspace();
             var formattedSyntax = Formatter.Format(classSyntax, workspace);
             var generatedClass = formattedSyntax.ToFullString();
+
             return generatedClass;
         }
-
-        //private CompilationUnitSyntax GetClassSyntax(string sectionName, SyntaxList<MemberDeclarationSyntax> members, bool generateGenericUsing, bool generateIniAttributeUsing)
-        //{
-        //    var usingSyntax = GetNecessaryUsingSyntax(generateGenericUsing, generateIniAttributeUsing);
-
-        //    return _syntaxGeneratorFacade.GetClassSyntax(sectionName, members, usingSyntax, _generatorConfiguration.NameSpace);
-        //}
-
-        //private SyntaxList<UsingDirectiveSyntax> GetNecessaryUsingSyntax(bool generateGenericUsing, bool generateIniAttributeUsing)
-        //{
-        //    var usingSyntax = new SyntaxList<UsingDirectiveSyntax>();
-        //    if (generateGenericUsing)
-        //    {
-        //        var collectionGenericUsingSyntax = _syntaxGeneratorFacade.GetUsingSyntax();
-        //        usingSyntax = usingSyntax.Add(collectionGenericUsingSyntax);
-        //    }
-
-        //    if (generateIniAttributeUsing)
-        //    {
-        //        var iniWrapperAttributeUsingSyntax = _syntaxGeneratorFacade.GetIniWrapperAttributeUsingSyntax();
-        //        usingSyntax = usingSyntax.Add(iniWrapperAttributeUsingSyntax);
-        //    }
-
-        //    return usingSyntax;
-        //}
-
-        //private (PropertyDeclarationSyntax GeneratedProperty, bool ShouldGenerateUsingGeneric) GetPropertyDeclarationSyntax(string propertyName, string iniValue)
-        //{
-        //    var valueType = _syntaxKindManager.GetSyntaxKind(iniValue);
-
-        //    if (valueType == SyntaxKind.List)
-        //    {
-        //        return (_syntaxGeneratorFacade.GetListPropertyDeclarationSyntax(propertyName, iniValue), true);
-        //    }
-
-        //    return (_syntaxGeneratorFacade.GetPropertyDeclarationSyntax(propertyName, iniValue, valueType), false);
-        //}
 
         private string GenerateClassFilePath(string sectionName)
         {
