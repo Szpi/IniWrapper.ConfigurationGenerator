@@ -25,7 +25,7 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.Generators
             {
                 var compilationUnitSyntax = _syntaxGeneratorFacade.GetCompilationUnitSyntax();
                 compilationUnitSyntax = _classToGenerateVisitors
-                                        .Aggregate(compilationUnitSyntax, (current, classToGenerateVisitor) => classToGenerateVisitor.Accept(current, classToGenerate));
+                                        .Aggregate(compilationUnitSyntax, (current, classToGenerateVisitor) => classToGenerateVisitor.Generate(current, classToGenerate));
 
                 compilationUnitsSyntax.Add((compilationUnitSyntax, classToGenerate.ClassName));
             }

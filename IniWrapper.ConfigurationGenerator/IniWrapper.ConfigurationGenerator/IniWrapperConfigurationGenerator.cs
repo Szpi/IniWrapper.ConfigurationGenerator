@@ -46,31 +46,6 @@ namespace IniWrapper.ConfigurationGenerator
             }
         }
 
-        //private void GenerateMainConfigurationClass(string mainConfiguration, List<string> sectionNames,
-        //                                            List<string> complexDataSections)
-        //{
-        //    var members = new SyntaxList<MemberDeclarationSyntax>();
-
-        //    foreach (var iniLine in sectionNames)
-        //    {
-        //        var propertyDeclaration = _syntaxGeneratorFacade.GetClassPropertyDeclarationSyntax(iniLine);
-        //        members = members.Add(propertyDeclaration);
-        //    }
-
-        //    foreach (var complexDataSection in complexDataSections)
-        //    {
-        //        var listOfComplexData = _syntaxGeneratorFacade.GetComplexListPropertyDeclarationSyntax(complexDataSection);
-
-        //        members = members.Add(listOfComplexData);
-        //    }
-
-        //    var classSyntax = GetClassSyntax(mainConfiguration, members, complexDataSections.Any(), false);
-
-        //    var generatedClass = FormatSyntax(classSyntax);
-
-        //    _fileSystem.File.WriteAllText(GenerateClassFilePath(mainConfiguration), generatedClass);
-        //}
-
         private void CreateOutputDictionary()
         {
             if (!_fileSystem.Directory.Exists(_generatorConfiguration.OutputFolder))
@@ -78,26 +53,6 @@ namespace IniWrapper.ConfigurationGenerator
                 _fileSystem.Directory.CreateDirectory(_generatorConfiguration.OutputFolder);
             }
         }
-
-        //private void GenerateSectionClass(string sectionName, IDictionary<string, string> propertiesNames)
-        //{
-        //    var members = new SyntaxList<MemberDeclarationSyntax>();
-
-        //    var generateGenericUsing = false;
-        //    foreach (var iniLine in propertiesNames)
-        //    {
-        //        var (propertyDeclaration, shouldGenerateGenericUsing) = GetPropertyDeclarationSyntax(iniLine.Key, iniLine.Value);
-        //        generateGenericUsing |= shouldGenerateGenericUsing;
-        //        propertyDeclaration = _syntaxGeneratorFacade.GetAttributeSyntax(sectionName, iniLine.Key, propertyDeclaration);
-        //        members = members.Add(propertyDeclaration);
-        //    }
-
-        //    var classSyntax = GetClassSyntax(sectionName, members, generateGenericUsing, _generatorConfiguration.GenerateIniOptionAttribute);
-
-        //    var generatedClass = FormatSyntax(classSyntax);
-
-        //    _fileSystem.File.WriteAllText(GenerateClassFilePath(sectionName), generatedClass);
-        //}
 
         private static string FormatSyntax(CompilationUnitSyntax classSyntax)
         {

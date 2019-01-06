@@ -5,6 +5,6 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator
 {
     public interface IClassToGenerateGenerator
     {
-        CompilationUnitSyntax Accept(CompilationUnitSyntax compilationUnitSyntax, ClassToGenerate classToGenerate);
+        CompilationUnitSyntax Generate(CompilationUnitSyntax compilationUnitSyntax, ClassToGenerate classToGenerate);
     }
 }

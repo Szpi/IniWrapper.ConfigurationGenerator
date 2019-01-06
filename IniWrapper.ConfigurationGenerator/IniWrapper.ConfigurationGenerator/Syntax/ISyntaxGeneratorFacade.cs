@@ -12,5 +12,6 @@ namespace IniWrapper.ConfigurationGenerator.Syntax
         PropertyDeclarationSyntax GetListPropertyDeclarationSyntax(string propertyName, SyntaxKind syntaxKind);
         SyntaxList<AttributeListSyntax> GetAttributeSyntax(string section, string key);
         CompilationUnitSyntax GetCompilationUnitSyntax();
+        NamespaceDeclarationSyntax GetNamespace(string @namespace);
     }
 }

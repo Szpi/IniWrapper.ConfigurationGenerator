@@ -12,16 +12,14 @@ namespace IniWrapper.ConfigurationGenerator.Syntax
         private readonly UsingSyntaxGenerator _usingSyntaxGenerator;
         private readonly PropertyDeclarationSyntaxGenerator _propertyDeclarationSyntaxGenerator;
         private readonly ClassDeclarationSyntaxGenerator _classDeclarationSyntaxGenerator;
-
-
         private readonly ListPropertyDeclarationSyntaxGenerator _listPropertyDeclarationSyntaxGenerator;
         private readonly IniOptionsAttributeSyntaxGenerator _iniOptionsAttributeSyntaxGenerator;
 
         public SyntaxGeneratorFacade(IniOptionsAttributeSyntaxGenerator iniOptionsAttributeSyntaxGenerator,
-                                      ListPropertyDeclarationSyntaxGenerator listPropertyDeclarationSyntaxGenerator,
-                                      PropertyDeclarationSyntaxGenerator propertyDeclarationSyntaxGenerator,
-                                      UsingSyntaxGenerator usingSyntaxGenerator,
-                                      ClassDeclarationSyntaxGenerator classDeclarationSyntaxGenerator)
+                                     ListPropertyDeclarationSyntaxGenerator listPropertyDeclarationSyntaxGenerator,
+                                     PropertyDeclarationSyntaxGenerator propertyDeclarationSyntaxGenerator,
+                                     UsingSyntaxGenerator usingSyntaxGenerator,
+                                     ClassDeclarationSyntaxGenerator classDeclarationSyntaxGenerator)
         {
             _iniOptionsAttributeSyntaxGenerator = iniOptionsAttributeSyntaxGenerator;
             _listPropertyDeclarationSyntaxGenerator = listPropertyDeclarationSyntaxGenerator;
@@ -58,6 +56,11 @@ namespace IniWrapper.ConfigurationGenerator.Syntax
         public CompilationUnitSyntax GetCompilationUnitSyntax()
         {
             return SyntaxFactory.CompilationUnit();
+        }
+
+        public NamespaceDeclarationSyntax GetNamespace(string @namespace)
+        {
+            return SyntaxFactory.NamespaceDeclaration(SyntaxFactory.IdentifierName(@namespace));
         }
     }
 }

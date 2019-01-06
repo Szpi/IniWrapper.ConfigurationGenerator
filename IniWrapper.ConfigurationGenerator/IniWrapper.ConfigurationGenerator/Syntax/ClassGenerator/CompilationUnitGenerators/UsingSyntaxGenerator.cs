@@ -13,7 +13,7 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator.CompilationUni
             _syntaxGeneratorFacade = syntaxGeneratorFacade;
         }
 
-        public CompilationUnitSyntax Accept(CompilationUnitSyntax compilationUnitSyntax, ClassToGenerate classToGenerate)
+        public CompilationUnitSyntax Generate(CompilationUnitSyntax compilationUnitSyntax, ClassToGenerate classToGenerate)
         {
             return classToGenerate.UsingsToGenerate
                                   .Select(@using => _syntaxGeneratorFacade.GetUsingSyntax(@using))
