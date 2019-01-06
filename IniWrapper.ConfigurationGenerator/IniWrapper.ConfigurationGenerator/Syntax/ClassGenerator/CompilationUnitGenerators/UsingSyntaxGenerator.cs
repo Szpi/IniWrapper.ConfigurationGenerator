@@ -2,13 +2,13 @@
 using IniWrapper.ConfigurationGenerator.Ini.Class;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace IniWrapper.ConfigurationGenerator.Syntax.Visitor.CompilationUnitVisitors
+namespace IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator.CompilationUnitGenerators
 {
-    public class UsingSyntaxVisitor : IClassToGenerateVisitor
+    public class UsingSyntaxGenerator : IClassToGenerateGenerator
     {
         private readonly ISyntaxGeneratorFacade _syntaxGeneratorFacade;
 
-        public UsingSyntaxVisitor(ISyntaxGeneratorFacade syntaxGeneratorFacade)
+        public UsingSyntaxGenerator(ISyntaxGeneratorFacade syntaxGeneratorFacade)
         {
             _syntaxGeneratorFacade = syntaxGeneratorFacade;
         }

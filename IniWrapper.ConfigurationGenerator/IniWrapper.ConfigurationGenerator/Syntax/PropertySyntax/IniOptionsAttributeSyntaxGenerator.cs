@@ -6,22 +6,9 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax
 {
     public class IniOptionsAttributeSyntaxGenerator
     {
-        private readonly bool _shouldAddAttribute;
-
-        public IniOptionsAttributeSyntaxGenerator(bool shouldAddAttribute)
+        public SyntaxList<AttributeListSyntax> AddIniOptionsAttributeToProperty(string section, string key)
         {
-            _shouldAddAttribute = shouldAddAttribute;
-        }
-
-        public PropertyDeclarationSyntax AddIniOptionsAttributeToProperty(string section, string key, PropertyDeclarationSyntax property)
-        {
-            if (!_shouldAddAttribute)
-            {
-                return property;
-            }
-
-            return property.WithAttributeLists(
-                SyntaxFactory.SingletonList<AttributeListSyntax>(
+            return SyntaxFactory.SingletonList<AttributeListSyntax>(
                     SyntaxFactory.AttributeList(
                         SyntaxFactory.SingletonSeparatedList<AttributeSyntax>(
                             SyntaxFactory.Attribute(
@@ -46,7 +33,7 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax
                                                     .WithNameEquals(
                                                         SyntaxFactory.NameEquals(
                                                             SyntaxFactory.IdentifierName("Key")))
-                                            })))))));
+                                            }))))));
         }
     }
 }

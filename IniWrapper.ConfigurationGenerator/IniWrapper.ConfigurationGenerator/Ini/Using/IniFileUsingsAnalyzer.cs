@@ -9,7 +9,7 @@ namespace IniWrapper.ConfigurationGenerator.Ini.Using
     public class IniFileUsingsAnalyzer : IIniFileUsingsAnalyzer
     {
         private const string CollectionsGenericUsing = "System.Collections.Generic";
-        private const string IniWrapperUsing = "IniWrapperUsing.Attribute";
+        private const string IniWrapperUsing = "IniWrapper.Attribute";
 
         private readonly GeneratorConfiguration _generatorConfiguration;
 

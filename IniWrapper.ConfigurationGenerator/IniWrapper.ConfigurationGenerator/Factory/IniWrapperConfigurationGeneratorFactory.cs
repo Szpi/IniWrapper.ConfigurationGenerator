@@ -9,11 +9,11 @@ using IniWrapper.ConfigurationGenerator.Syntax.Generators;
 using IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax;
 using IniWrapper.ConfigurationGenerator.Syntax.PropertySyntax.Kind;
 using IniWrapper.ConfigurationGenerator.Syntax.UsingSyntax;
-using IniWrapper.ConfigurationGenerator.Syntax.Visitor;
-using IniWrapper.ConfigurationGenerator.Syntax.Visitor.ClassDeclarationVisitors;
-using IniWrapper.ConfigurationGenerator.Syntax.Visitor.CompilationUnitVisitors;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator;
+using IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator.ClassDeclarationGenerators;
+using UsingSyntaxGenerator = IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator.CompilationUnitGenerators.UsingSyntaxGenerator;
 
 namespace IniWrapper.ConfigurationGenerator.Factory
 {
@@ -24,11 +24,10 @@ namespace IniWrapper.ConfigurationGenerator.Factory
             var iniWrapper = new IniParserWrapper(configuration.FilePath, configuration.BufferSize, new ReadSectionsParser());
             var syntaxManager = new SyntaxKindManager(configuration.ListSeparator);
 
-            var syntaxGeneratorFacade = new SyntaxGeneratorFacade(new IniOptionsAttributeSyntaxGenerator(configuration.GenerateIniOptionAttribute),
+            var syntaxGeneratorFacade = new SyntaxGeneratorFacade(  new IniOptionsAttributeSyntaxGenerator(),
                                                                     new ListPropertyDeclarationSyntaxGenerator(syntaxManager, configuration.ListSeparator),
                                                                     new PropertyDeclarationSyntaxGenerator(),
-                                                                    new UsingSyntaxGenerator(),
-                                                                    new ClassPropertyDeclarationSyntaxGenerator(),
+                                                                    new Syntax.UsingSyntax.UsingSyntaxGenerator(),
                                                                     new ClassDeclarationSyntaxGenerator());
 
             var iniFileAnalyzer = new IniFileAnalyzer(iniWrapper,
@@ -38,16 +37,16 @@ namespace IniWrapper.ConfigurationGenerator.Factory
                 configuration.MainConfigurationClassName);
 
 
-            var classDeclarationVisitors = new List<IClassDeclarationVisitor>()
+            var classDeclarationVisitors = new List<IClassDeclarationGenerator>()
             {
-                new PropertySyntaxVisitor(syntaxGeneratorFacade),
-                new PropertyListSyntaxVisitor(syntaxGeneratorFacade)
+                new PropertySyntaxGenerator(syntaxGeneratorFacade),
+                new PropertyListSyntaxGenerator(syntaxGeneratorFacade)
             };
 
-            var classSyntaxVisitors = new List<IClassToGenerateVisitor>()
+            var classSyntaxVisitors = new List<IClassToGenerateGenerator>()
             {
-                new UsingSyntaxVisitor(syntaxGeneratorFacade),
-                new ClassSyntaxVisitor(syntaxGeneratorFacade,classDeclarationVisitors)
+                new UsingSyntaxGenerator(syntaxGeneratorFacade),
+                new ClassSyntaxGenerator(syntaxGeneratorFacade,classDeclarationVisitors)
             };
 
             var syntaxGenerators = new List<ICompilationUnitGenerator>()

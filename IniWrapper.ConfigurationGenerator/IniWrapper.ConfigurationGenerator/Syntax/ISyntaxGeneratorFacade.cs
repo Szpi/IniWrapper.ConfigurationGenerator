@@ -10,12 +10,7 @@ namespace IniWrapper.ConfigurationGenerator.Syntax
         PropertyDeclarationSyntax GetPropertyDeclarationSyntax(string propertyName, SyntaxKind syntaxKind);
         ClassDeclarationSyntax GetClassSyntax(string className);
         PropertyDeclarationSyntax GetListPropertyDeclarationSyntax(string propertyName, SyntaxKind syntaxKind);
-
-
-        PropertyDeclarationSyntax AddIniOptionsAttributeToProperty(string section, string key, PropertyDeclarationSyntax property);
-        PropertyDeclarationSyntax GetClassPropertyDeclarationSyntax(string iniLine);
-
-
+        SyntaxList<AttributeListSyntax> GetAttributeSyntax(string section, string key);
         CompilationUnitSyntax GetCompilationUnitSyntax();
     }
 }

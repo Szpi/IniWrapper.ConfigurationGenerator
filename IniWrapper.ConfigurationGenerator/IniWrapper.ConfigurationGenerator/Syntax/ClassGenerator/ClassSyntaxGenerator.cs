@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using IniWrapper.ConfigurationGenerator.Ini.Class;
-using IniWrapper.ConfigurationGenerator.Syntax.Visitor.ClassDeclarationVisitors;
+using IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator.ClassDeclarationGenerators;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace IniWrapper.ConfigurationGenerator.Syntax.Visitor
+namespace IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator
 {
-    public class ClassSyntaxVisitor : IClassToGenerateVisitor
+    public class ClassSyntaxGenerator : IClassToGenerateGenerator
     {
         private readonly ISyntaxGeneratorFacade _syntaxGeneratorFacade;
-        private readonly IReadOnlyList<IClassDeclarationVisitor> _classDeclarationVisitors;
+        private readonly IReadOnlyList<IClassDeclarationGenerator> _classDeclarationVisitors;
 
-        public ClassSyntaxVisitor(ISyntaxGeneratorFacade syntaxGeneratorFacade, IReadOnlyList<IClassDeclarationVisitor> classDeclarationVisitors)
+        public ClassSyntaxGenerator(ISyntaxGeneratorFacade syntaxGeneratorFacade, IReadOnlyList<IClassDeclarationGenerator> classDeclarationVisitors)
         {
             _syntaxGeneratorFacade = syntaxGeneratorFacade;
             _classDeclarationVisitors = classDeclarationVisitors;
@@ -19,7 +19,6 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.Visitor
         public CompilationUnitSyntax Accept(CompilationUnitSyntax compilationUnitSyntax, ClassToGenerate classToGenerate)
         {
             var classDeclarationSyntax = _syntaxGeneratorFacade.GetClassSyntax(classToGenerate.ClassName);
-
             foreach (var classDeclarationVisitor in _classDeclarationVisitors)
             {
                 classDeclarationSyntax = classDeclarationVisitor.Accept(classDeclarationSyntax, classToGenerate);

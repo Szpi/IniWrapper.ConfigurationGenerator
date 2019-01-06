@@ -1,6 +1,5 @@
 ﻿using IniWrapper.ConfigurationGenerator.Configuration;
 using IniWrapper.ConfigurationGenerator.Ini;
-using IniWrapper.ConfigurationGenerator.Syntax.Visitor;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
@@ -37,7 +36,7 @@ namespace IniWrapper.ConfigurationGenerator
 
             foreach (var syntaxVisitor in _syntaxVisitors)
             {
-                var syntaxesToGenerate = syntaxVisitor.Accept(iniFileContext);
+                var syntaxesToGenerate = syntaxVisitor.Generate(iniFileContext);
 
                 foreach (var (compilationUnitsSyntax, className) in syntaxesToGenerate)
                 {
@@ -89,7 +88,7 @@ namespace IniWrapper.ConfigurationGenerator
         //    {
         //        var (propertyDeclaration, shouldGenerateGenericUsing) = GetPropertyDeclarationSyntax(iniLine.Key, iniLine.Value);
         //        generateGenericUsing |= shouldGenerateGenericUsing;
-        //        propertyDeclaration = _syntaxGeneratorFacade.AddIniOptionsAttributeToProperty(sectionName, iniLine.Key, propertyDeclaration);
+        //        propertyDeclaration = _syntaxGeneratorFacade.GetAttributeSyntax(sectionName, iniLine.Key, propertyDeclaration);
         //        members = members.Add(propertyDeclaration);
         //    }
 

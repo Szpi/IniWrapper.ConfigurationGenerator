@@ -1,23 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using IniWrapper.ConfigurationGenerator.Ini;
-using IniWrapper.ConfigurationGenerator.Syntax.Visitor;
+using IniWrapper.ConfigurationGenerator.Syntax.ClassGenerator;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace IniWrapper.ConfigurationGenerator.Syntax.Generators
 {
     public class ClassCompilationUnitGenerator : ICompilationUnitGenerator
     {
-        private readonly IReadOnlyList<IClassToGenerateVisitor> _classToGenerateVisitors;
+        private readonly IReadOnlyList<IClassToGenerateGenerator> _classToGenerateVisitors;
         private readonly ISyntaxGeneratorFacade _syntaxGeneratorFacade;
 
-        public ClassCompilationUnitGenerator(IReadOnlyList<IClassToGenerateVisitor> classToGenerateVisitors, ISyntaxGeneratorFacade syntaxGeneratorFacade)
+        public ClassCompilationUnitGenerator(IReadOnlyList<IClassToGenerateGenerator> classToGenerateVisitors, ISyntaxGeneratorFacade syntaxGeneratorFacade)
         {
             _classToGenerateVisitors = classToGenerateVisitors;
             _syntaxGeneratorFacade = syntaxGeneratorFacade;
         }
 
-        public List<(CompilationUnitSyntax compilationUnitsSyntax, string className)> Accept(IniFileContext iniFileContext)
+        public List<(CompilationUnitSyntax compilationUnitsSyntax, string className)> Generate(IniFileContext iniFileContext)
         {
             var compilationUnitsSyntax = new List<(CompilationUnitSyntax compilationUnitsSyntax, string className)>();
 
@@ -25,7 +25,7 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.Generators
             {
                 var compilationUnitSyntax = _syntaxGeneratorFacade.GetCompilationUnitSyntax();
                 compilationUnitSyntax = _classToGenerateVisitors
-                                       .Aggregate(compilationUnitSyntax, (current, classToGenerateVisitor) => classToGenerateVisitor.Accept(current, classToGenerate));
+                                        .Aggregate(compilationUnitSyntax, (current, classToGenerateVisitor) => classToGenerateVisitor.Accept(current, classToGenerate));
 
                 compilationUnitsSyntax.Add((compilationUnitSyntax, classToGenerate.ClassName));
             }

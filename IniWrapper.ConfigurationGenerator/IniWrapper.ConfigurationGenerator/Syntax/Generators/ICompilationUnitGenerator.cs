@@ -6,6 +6,6 @@ namespace IniWrapper.ConfigurationGenerator.Syntax.Generators
 {
     public interface ICompilationUnitGenerator
     {
-        List<(CompilationUnitSyntax compilationUnitsSyntax, string className)> Accept(IniFileContext iniFileContext);
+        List<(CompilationUnitSyntax compilationUnitsSyntax, string className)> Generate(IniFileContext iniFileContext);
     }
 }
